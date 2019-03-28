@@ -1,7 +1,7 @@
-import POSToken.{phrase, rep1}
+import lexParser.POSToken
 
 object Main {
   def main(args: Array[String]): Unit = {
-    POSToken.tokens;
+    print("In Main"); 
   }
 }

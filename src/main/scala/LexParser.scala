@@ -1,4 +1,6 @@
-import scala.util.parsing.combinator.RegexParsers
+package lexParser
+
+import scala.util.parsing.combinator._
 
 sealed trait POSToken
 
@@ -34,11 +36,11 @@ case object DELETEHEADER extends POSToken
 case object DELETEFOOTER extends POSToken
 case object ADDUSER extends POSToken
 
-object POSToken extends RegexParsers {
+class LexParser extends RegexParsers {
     override def skipWhitespace = true
     override val whiteSpace = "[ \t\r\f\n]+".r
 
-    def createShop = "createShop" ^^ (_ => CREATESHOP)
+    def createShop = "createShop" ^^(_ => CREATESHOP)
     def renameShop = "renameShop" ^^(_ => RENAMESHOP)
 
     def addItem = "addItem" ^^ (_ => ADDITEM)
@@ -58,40 +60,29 @@ object POSToken extends RegexParsers {
     def addUser = "addUser" ^^(_ => ADDUSER)
 
 
-    def tokens: Parser[List[POSToken]] = {
+    /*def tokens: Parser[List[POSToken]] = {
         phrase(rep1(createShop | addItem)) ^^ { rawTokens =>
-            println(rawTokens)
+            var stuf: List[POSToken];
+            println("Got Here");
+            return stuf.addString("jeu");
         }
     }
+*/
 
-
-    /*def identifier: Parser[IDENTIFIER] = {
+    def identifier: Parser[IDENTIFIER] = {
       "[a-zA-Z_][a-zA-Z0-9_]*".r ^^ { str => IDENTIFIER(str) }
     }
+}
 
 
 
-    def term  : Parser[Double] = factor ~ rep( "*" ~ factor | "/" ~ factor) ^^ {
-      case number ~ list => (number /: list) {
-        case (x, "*" ~ y) => x * y
-        case (x, "/" ~ y) => x / y
-      }
-    }
+object TestLexParser extends LexParser {
+    def main(args: Array[String]): Unit = {
 
-  */
-    //Patterns are recognized as term ~ exp ~ number, the ~ is the parser composition
-    def expr  : Parser[Double] = term ~ rep("+" ~ log(term)("Plus term") | "-" ~ log(term)("Minus term")) ^^ {
-        case number ~ list => list.foldLeft(number) { // same as before, using alternate name for /:
-            case (x, "+" ~ y) => x + y
-            case (x, "-" ~ y) => x - y
-        }
-    }
-
-    def apply(tokens: Seq[POSToken]): Either[WorkflowParserError, WorkflowAST] = {
-        val reader = new WorkflowTokenReader(tokens)
-        program(reader) match {
-            case NoSuccess(msg, next) => Left(WorkflowParserError(msg))
-            case Success(result, next) => Right(result)
+        parse(identifier, "isidh") match {
+            case Success(matched,_) => println(matched)
+            case Failure(msg,_) => println(s"FAILURE: $msg")
+            case Error(msg,_) => println(s"ERROR: $msg")
         }
     }
 }

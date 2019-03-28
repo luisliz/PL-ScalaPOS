@@ -4,7 +4,7 @@
 		module="scalapos$sources"
 		revision="0.1"
 		status="integration"
-		publication="20190328114251"
+		publication="20190328184308"
 	/>
 	<configurations>
 		<conf name="compile" visibility="public" description=""/>
