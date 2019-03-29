@@ -1,6 +1,7 @@
 package lexParser
 
 import scala.util.parsing.combinator._
+import scala.io.Source
 
 sealed trait POSToken
 
@@ -14,6 +15,7 @@ case object CALLSERVICE extends POSToken
 case object SWITCH extends POSToken
 case object OTHERWISE extends POSToken
 case object COLON extends POSToken
+case object SEMICOLON extends POSToken
 case object ARROW extends POSToken
 case object EQUALS extends POSToken
 case object COMMA extends POSToken
@@ -36,10 +38,14 @@ case object DELETEHEADER extends POSToken
 case object DELETEFOOTER extends POSToken
 case object ADDUSER extends POSToken
 
-class LexParser extends RegexParsers {
+trait POSCompilationError
+case class POSLexerError(msg: String) extends POSCompilationError
+
+object POSLexer extends RegexParsers {
     override def skipWhitespace = true
     override val whiteSpace = "[ \t\r\f\n]+".r
 
+    //Reserved Words
     def createShop = "createShop" ^^(_ => CREATESHOP)
     def renameShop = "renameShop" ^^(_ => RENAMESHOP)
 
@@ -59,30 +65,73 @@ class LexParser extends RegexParsers {
 
     def addUser = "addUser" ^^(_ => ADDUSER)
 
+    //Symbols
+    def colon         = ":"             ^^ (_ => COLON)
+    def comma         = ","             ^^ (_ => COMMA)
+    def semiColon = ";" ^^(_ => SEMICOLON)
 
-    /*def tokens: Parser[List[POSToken]] = {
-        phrase(rep1(createShop | addItem)) ^^ { rawTokens =>
-            var stuf: List[POSToken];
-            println("Got Here");
-            return stuf.addString("jeu");
+    def identifier: Parser[POSToken] = {
+        "\"[a-zA-Z_][a-zA-Z0-9_]*\"".r ^^ { str => IDENTIFIER(str) }
+    }
+
+    private def processIndentations(tokens: List[POSToken],
+                                    indents: List[Int] = List(0)): List[POSToken] = {
+        tokens.headOption match {
+
+            // if there is an increase in indentation level, we push this new level into the stack
+            // and produce an INDENT
+            case Some(INDENTATION(spaces)) if spaces > indents.head =>
+                INDENT :: processIndentations(tokens.tail, spaces :: indents)
+
+            // if there is a decrease, we pop from the stack until we have matched the new level,
+            // producing a DEDENT for each pop
+            case Some(INDENTATION(spaces)) if spaces < indents.head =>
+                val (dropped, kept) = indents.partition(_ > spaces)
+                (dropped map (_ => DEDENT)) ::: processIndentations(tokens.tail, kept)
+
+            // if the indentation level stays unchanged, no tokens are produced
+            case Some(INDENTATION(spaces)) if spaces == indents.head =>
+                processIndentations(tokens.tail, indents)
+
+            // other tokens are ignored
+            case Some(token) =>
+                token :: processIndentations(tokens.tail, indents)
+
+            // the final step is to produce a DEDENT for each indentation level still remaining, thus
+            // "closing" the remaining open INDENTS
+            case None =>
+                indents.filter(_ > 0).map(_ => DEDENT)
+
         }
     }
-*/
 
-    def identifier: Parser[IDENTIFIER] = {
-      "[a-zA-Z_][a-zA-Z0-9_]*".r ^^ { str => IDENTIFIER(str) }
+
+    def tokens: Parser[List[POSToken]] = {
+        phrase(rep1(createShop | addItem | colon | comma | semiColon)) ^^ { rawTokens =>
+            processIndentations(rawTokens)
+        }
     }
+
+    def apply(code: String): Either[POSLexerError, List[POSToken]] = {
+        parse(tokens, code) match {
+            case NoSuccess(msg, next) => Left(POSLexerError(msg))
+            case Success(result, next) => Right(result)
+        }
+    }
+}
+
+object POSParser extends Parsers {
+
 }
 
 
 
-object TestLexParser extends LexParser {
+object TestLexParser {
     def main(args: Array[String]): Unit = {
 
-        parse(identifier, "isidh") match {
-            case Success(matched,_) => println(matched)
-            case Failure(msg,_) => println(s"FAILURE: $msg")
-            case Error(msg,_) => println(s"ERROR: $msg")
-        }
+        val fileName = "TestFile"
+        var fileContent = Source.fromFile(fileName).getLines.mkString;
+
+        println(POSLexer.apply("createShop"))
     }
 }

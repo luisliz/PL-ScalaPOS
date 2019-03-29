@@ -1,0 +1,22 @@
+/* Creates empty shop GUI with the given title */
+createShop: "My Shop";
+
+/* Adds specified item to the shop GUI */
+addItem: "food", "arroz", arroz.jpg, 300, 1.50;
+addItem: "drink, "cocacola", null, 500, 1;
+
+/* Adds or subtracts inventory to item */
+addInventory: "arroz", 3;
+removeInventory: "cocacola", 20;
+
+/* Overrides inventory with new parameters */
+updateInventory: "arroz", 200;
+
+/* Overrides price */
+updatePrice: "arroz", 1.60;
+
+/* Remove an item from the shop GUI */
+deleteItem: "cocacola";
+
+/* Set the string passed as an input as the receipt footer */
+receiptFooter: "Thank you for shopping with us"
