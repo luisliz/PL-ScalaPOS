@@ -22,6 +22,7 @@ case object COMMA extends POSToken
 case object INDENT extends POSToken
 case object DEDENT extends POSToken
 
+//shop tokens
 case object CREATESHOP extends POSToken
 case object RENAMESHOP extends POSToken
 case object ADDITEM extends POSToken
@@ -32,11 +33,20 @@ case object REMOVEINVENTORY extends POSToken
 case object UPDATEPRICE extends POSToken
 case object UPDATECATEGORY extends POSToken
 case object UPDATEPHOTO extends POSToken
+case object SETELEMENTSGRIDDIMENSIONS extends POSToken
+case object SETCARTSIZE extends POSToken
+case object ADDTOCART extends POSToken //maybe we could do these add and remove un poco mas  modulares? i'll explain later -jorge
+case object REMOVEFROMCART extends POSToken
+
+//account management tokens (faltan mas)
+case object ADDUSER extends POSToken
+
+//receipt tokens
 case object RECEIPTHEADER extends POSToken
 case object RECIPTFOOTER extends POSToken
 case object DELETEHEADER extends POSToken
 case object DELETEFOOTER extends POSToken
-case object ADDUSER extends POSToken
+
 
 trait POSCompilationError
 case class POSLexerError(msg: String) extends POSCompilationError
@@ -57,6 +67,10 @@ object POSLexer extends RegexParsers {
     def updatePrice = "updatePrice" ^^ (_ => UPDATEPRICE)
     def updateCategory = "updateCategory" ^^ (_ => UPDATECATEGORY)
     def updatePhoto = "updatePhoto" ^^ (_ => UPDATEPHOTO)
+    def setElementsGridDimensions = "setElementsGridDimensions" ^^ (_ => SETELEMENTSGRIDDIMENSIONS)
+    def setCartSize = "setCartSize" ^^ (_ => SETCARTSIZE)
+    def addToCart = "addToCart" ^^ (_ => ADDTOCART)
+    def removeFromCart = "removeFromCart" ^^ (_ => REMOVEFROMCART)
 
     def receiptHeader = "receiptHeader" ^^ (_ => RECEIPTHEADER)
     def reciptFooter = "reciptFooter" ^^ (_ => RECIPTFOOTER)
