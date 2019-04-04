@@ -26,6 +26,7 @@ case object COMMA extends POSToken
 case object INDENT extends POSToken
 case object DEDENT extends POSToken
 
+//shop tokens
 case object CREATESHOP extends POSToken
 case object RENAMESHOP extends POSToken
 case object ADDITEM extends POSToken
