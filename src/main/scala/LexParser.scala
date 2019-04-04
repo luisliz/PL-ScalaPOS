@@ -50,7 +50,6 @@ case object RECEIPTHEADER extends POSToken
 case object RECIPTFOOTER extends POSToken
 case object DELETEHEADER extends POSToken
 case object DELETEFOOTER extends POSToken
-case object ADDUSER extends POSToken
 //FINISH LEXER STUFF
 
 
@@ -112,7 +111,7 @@ object POSLexer extends RegexParsers {
     }
 
     def identifier: Parser[POSToken] = {
-        "\"[a-zA-Z_][a-zA-Z0-9_]*\"".r ^^ { str => IDENTIFIER(str) }
+        "[a-zA-Z_][a-zA-Z0-9_]*".r ^^ { str => IDENTIFIER(str) }
     }
 
     private def processIndentations(tokens: List[POSToken],
