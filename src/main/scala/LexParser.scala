@@ -72,6 +72,8 @@ case class Equals(factName: String, factValue: String) extends Condition
 trait POSCompilationError
 
 case class POSLexerError(msg: String) extends POSCompilationError
+case class POSParserError(msg: String) extends POSCompilationError
+
 
 object POSLexer extends RegexParsers {
     override def skipWhitespace = true
@@ -145,7 +147,6 @@ object POSLexer extends RegexParsers {
         }
     }
 
-
     def tokens: Parser[List[POSToken]] = {
         phrase(rep1(createShop | addItem | colon | comma | semiColon)) ^^ { rawTokens =>
             processIndentations(rawTokens)
@@ -167,16 +168,41 @@ class POSTokenReader(tokens: Seq[POSToken]) extends Reader[POSToken] {
     override def rest: Reader[POSToken] = new POSTokenReader(tokens.tail)
 }
 
-object POSParser extends Parsers {
+object POSParser extends RegexParsers {
     override type Elem = POSToken
 
-    def statement: Parser[PosAST] = {
-        val createShop = CREATESHOP ~ COLON ~ rep(STRING) ~ SEMICOLON;
+    def program: Parser[PosAST] = {
+        phrase(block)
+    }
 
-        val renameShop = RENAMESHOP ~ COLON ~ rep(STRING) ~ SEMICOLON
+    def block: Parser[PosAST] = {
+        rep1(statement) ^^ { case stmtList => stmtList reduceRight AndThen }
+    }
+
+    def statement: POSParser.Parser[POSToken ~ POSToken ~ POSToken] = {
+        val createShop = CREATESHOP ~ COLON ~ SEMICOLON
+        val renameShop = RENAMESHOP ~ COLON ~ SEMICOLON //val renameShop = RENAMESHOP ~ COLON ~ rep(STRING) ~ SEMICOLON
         createShop | renameShop
     }
+
+    def apply(tokens: Seq[POSToken]): Either[POSParserError, PosAST] = {
+        val reader = new POSTokenReader(tokens)
+        program(reader) match {
+            case NoSuccess(msg, next) => Left(POSParserError(msg))
+            case Success(result, next) => Right(result)
+        }
+    }
 }
+
+object POSCompiler {
+    def apply(code: String): Either[POSCompilationError, PosAST] = {
+        for {
+            tokens <- POSLexer(code).right
+            ast <- POSParser(tokens).right
+        } yield ast
+    }
+}
+
 
 object TestLexParser {
     def main(args: Array[String]): Unit = {
@@ -185,5 +211,7 @@ object TestLexParser {
         var fileContent = Source.fromFile(fileName).getLines.mkString;
 
         println(POSLexer.apply("createShop"))
+
+        println(POSParser.statement)
     }
 }
