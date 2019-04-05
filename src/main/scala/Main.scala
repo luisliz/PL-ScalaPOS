@@ -1,7 +1,15 @@
-import lexParser.POSToken
+import scala.swing._
 
-object Main {
-  def main(args: Array[String]): Unit = {
-    print("In Main"); 
+class UI extends MainFrame {
+  title = "GUI Program #1"
+  preferredSize = new Dimension(320, 240)
+  contents = new Label("Here is the contents!")
+}
+
+object GuiProgramOne {
+  def main(args: Array[String]) {
+    val ui = new UI
+    ui.visible = true
+    println("End of main function")
   }
 }
