@@ -4,13 +4,27 @@ import scala.swing._
 
 class ShopWindow(name: String) extends MainFrame{
 
-  /* Constructor if no name is passed */
+  /** To Do:
+    * -GridBag Panel
+    * -Section with all items on cart and their amount and total
+    * -Only can hit remove from cart button if its on cart (this button should also be next to the item on the cart section
+    * -Lower inventory with every click and restore it if item removed from cart
+    * -Only can add to cart if enough inventory
+    * -Pass info to the receipt
+    * */
+
+  /** Constructor if no name is passed */
   def this() = this("SPCS")
 
 //  private var itemList = List[Item]()
   // Just testing :)
   private var itemList = List(new Item("idk", "coca-cola", "123", 10, 0.99),
-    new Item("idk", "arroz", "123", 22, 2.99))
+    new Item("idk", "arroz", "123", 54, 2.99),
+    new Item("idk", "pizza", "123", 49, 14.99),
+    new Item("idk", "coco", "123", 11, 2.99),
+    new Item("idk", "doritos", "123", 102, 1.37),
+    new Item("idk", "guitarra", "123", 22, 100),
+    new Item("idk", "avestruz", "123", 1, 100000))
 
   private var transactionTotal: Double = 0
 
@@ -23,14 +37,12 @@ class ShopWindow(name: String) extends MainFrame{
   title = name
   preferredSize = new Dimension(800, 500)
 
-  private var totalLabelBox = new BoxPanel(Orientation.Horizontal){
-    contents += new Label("Total: $" + transactionTotal)
-  }
+  private var totalLabel = new Label("Total: $" + transactionTotal)
 
   contents = new BoxPanel(Orientation.Vertical) {
 
     contents += Button("Checkout") { checkout() }
-    contents += new BoxPanel(Orientation.Horizontal) {
+    contents += new FlowPanel() {
       //Testing how to add items
       for (i <- itemList) {
 
@@ -41,11 +53,11 @@ class ShopWindow(name: String) extends MainFrame{
           contents += Swing.VStrut(10)
           contents += new Label("Amount left: " + i.inventory)
           contents += Button("Remove from cart") { removeFromTotal(i.price) }
-
+          border = Swing.MatteBorder(1, 1, 1, 1, java.awt.Color.BLACK)
         }
       }
     } // End items section
-    contents += totalLabelBox
+    contents += totalLabel
 
   } // End contents
 
@@ -84,7 +96,7 @@ class ShopWindow(name: String) extends MainFrame{
 
   private def addToTotal(amountToAdd: Double): Unit = {
     transactionTotal += amountToAdd
-    totalLabelBox.repaint()
+    totalLabel.text_=("Total: $" + f"$transactionTotal%1.2f")
     println("transactionTotal: " + transactionTotal)
   }
 
@@ -92,7 +104,7 @@ class ShopWindow(name: String) extends MainFrame{
    * are already part of the total so the amount should never be negative */
   private def removeFromTotal(amountToRemove: Double): Unit = {
     transactionTotal = transactionTotal - amountToRemove
-    totalLabelBox.repaint()
+    totalLabel.text_=("Total: $" + f"$transactionTotal%1.2f")
     println("transactionTotal: " + transactionTotal)
   }
 
