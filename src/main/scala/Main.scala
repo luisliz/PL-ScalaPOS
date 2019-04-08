@@ -1,7 +1,7 @@
 import shopgui.ShopWindow
 
 
-object GuiProgramOne {
+object Main {
   def main(args: Array[String]) {
     val gui = new ShopWindow
     gui.visible = true

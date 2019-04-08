@@ -5,12 +5,14 @@ import scala.swing._
 class ShopWindow(name: String) extends MainFrame{
 
   /** To Do:
-    * -GridBag Panel
+    * -GridBag Panel can be used to divide into cart and items sections http://otfried.org/scala/index_42.html
     * -Section with all items on cart and their amount and total
-    * -Only can hit remove from cart button if its on cart (this button should also be next to the item on the cart section
-    * -Lower inventory with every click and restore it if item removed from cart
-    * -Only can add to cart if enough inventory
+    * -Only can hit remove from cart button if its on cart (this button could also be next to the item on the cart section)
+    * -[DONE] Lower inventory with every click and restore it if item removed from cart
+    * -[DONE] Only can add to cart if enough inventory
     * -Pass info to the receipt
+    * -Label that says the amount there is of an item in the cart currently (thinking of making it a var in Item class)
+    * -add images for items and change on Item class (currently images are set as strings)
     * */
 
   /** Constructor if no name is passed */
@@ -47,12 +49,14 @@ class ShopWindow(name: String) extends MainFrame{
       for (i <- itemList) {
 
         contents += new BoxPanel(Orientation.Vertical) {
-          contents += Button(i.name) { addToTotal(i.price) }
+          var addToCartButton = Button(i.name) { addToCart(i, this) }
+          addToCartButton.enabled_=(i.inventory > 0)
+          contents += addToCartButton
           contents += Swing.VStrut(10)
           contents += new Label("$" + i.price)
           contents += Swing.VStrut(10)
           contents += new Label("Amount left: " + i.inventory)
-          contents += Button("Remove from cart") { removeFromTotal(i.price) }
+          contents += Button("Remove from cart") { removeFromCart(i, this) }
           border = Swing.MatteBorder(1, 1, 1, 1, java.awt.Color.BLACK)
         }
       }
@@ -94,18 +98,65 @@ class ShopWindow(name: String) extends MainFrame{
     Dialog.showMessage(contents.head, receiptHeader + "\n\n\n\nContent for receipt goes here\n\n\n\n" + receiptFooter, title="Receipt")
   }
 
+  private def addToCart(item: Item, boxPanel: BoxPanel): Unit = {
+    // update item inventory
+    addToTotal(item.price)
+    item.removeInventory(1)
+    println("inventory: " + item.inventory)
+
+    // disable button if necessary
+    if (item.inventory <= 0) {
+      val newButton = boxPanel.contents.head
+      newButton.enabled_=(false)
+      boxPanel.contents.update(0, newButton)
+    }
+
+    // update amount left label
+    updateAmountLabel(item, boxPanel)
+//    println(item.inventory)
+
+  }
+
   private def addToTotal(amountToAdd: Double): Unit = {
     transactionTotal += amountToAdd
     totalLabel.text_=("Total: $" + f"$transactionTotal%1.2f")
     println("transactionTotal: " + transactionTotal)
   }
 
+  private def removeFromCart(item: Item, boxPanel: BoxPanel): Unit = {
+    // update item inventory
+    removeFromTotal(item.price)
+    item.addInventory(1)
+    println("inventory: " + item.inventory)
+
+    // enable button if necessary
+    if (item.inventory > 0) {
+      val newButton = boxPanel.contents.head
+      newButton.enabled_=(true)
+      boxPanel.contents.update(0, newButton)
+    }
+
+    // update amount left label
+    updateAmountLabel(item, boxPanel)
+//    println(item.inventory)
+
+  }
   /* This doesn't have a condition for if the total gets to be less than 0 because the button should only be clickable with items that
    * are already part of the total so the amount should never be negative */
   private def removeFromTotal(amountToRemove: Double): Unit = {
-    transactionTotal = transactionTotal - amountToRemove
+    transactionTotal -= amountToRemove
     totalLabel.text_=("Total: $" + f"$transactionTotal%1.2f")
     println("transactionTotal: " + transactionTotal)
+  }
+
+  private def updateAmountLabel(item: Item, boxPanel: BoxPanel): Unit = {
+    val newAmountLeft = new Label("Amount left: " + item.inventory)
+//    val elements = boxPanel.contents.toArray
+    //println(elements(4))
+    boxPanel.contents.update(4, newAmountLeft)
+//    val elements2 = boxPanel.contents.toArray
+//    println(elements2(4).toString())
+    boxPanel.repaint()
   }
 
 
