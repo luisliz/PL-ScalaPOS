@@ -9,22 +9,16 @@ sealed trait POSToken
 //START LEXER STUFF
 //The reserved tokens
 case class IDENTIFIER(str: String) extends POSToken
-case class LITERAL(str: String) extends POSToken
 case class STRING(str: String) extends POSToken
+case class ALLTOKENS(rawTokens: List[POSToken]) extends POSToken
 
-case class INDENTATION(spaces: Int) extends POSToken
-case object EXIT extends POSToken
-case object READINPUT extends POSToken
-case object CALLSERVICE extends POSToken
-case object SWITCH extends POSToken
-case object OTHERWISE extends POSToken
 case object COLON extends POSToken
-case object SEMICOLON extends POSToken
-case object ARROW extends POSToken
-case object EQUALS extends POSToken
+//case object SEMICOLON extends POSToken
 case object COMMA extends POSToken
-case object INDENT extends POSToken
-case object DEDENT extends POSToken
+
+//case class INDENTATION(spaces: Int) extends POSToken
+//case object INDENT extends POSToken
+//case object DEDENT extends POSToken
 
 //shop tokens
 case object CREATESHOP extends POSToken
@@ -38,8 +32,7 @@ case object UPDATEPRICE extends POSToken
 case object UPDATECATEGORY extends POSToken
 case object UPDATEPHOTO extends POSToken
 case object SETELEMENTSGRIDDIMENSIONS extends POSToken
-case object SETCARTSIZE extends POSToken
-case object ADDTOCART extends POSToken //maybe we could do these add and remove un poco mas  modulares? i'll explain later -jorge
+case object ADDTOCART extends POSToken
 case object REMOVEFROMCART extends POSToken
 
 //account management tokens (faltan mas)
@@ -55,11 +48,14 @@ case object DELETEFOOTER extends POSToken
 
 //START PARSER STUFF
 sealed trait PosAST
-case class AndThen(step1: PosAST, step2: PosAST) extends PosAST
-case class ReadInput(inputs: Seq[String]) extends PosAST
-case class CallService(serviceName: String) extends PosAST
-case class Choice(alternatives: Seq[ConditionThen]) extends PosAST
-case object Exit extends PosAST
+case class Execute(exp1: PosAST, exp2: PosAST) extends PosAST //dont know if this should stay with two actions or just change it to one
+case class CreateShop(name: String) extends PosAST
+case class CreateShopEmpty() extends PosAST
+case class RenameShop(newName: String) extends PosAST
+case class AddItem(category: String, name: String, photo: String, invAmount: String, price: String) extends PosAST //shouldnt the number parameters be of type Int? could we put em here as strings and then handle the string and do something like toInt to it?
+case class DeleteItem(itemName: String) extends PosAST
+case class UpdateInventory(itemName: String, newAmount: String) extends PosAST
+
 
 sealed trait ConditionThen { def thenBlock: PosAST }
 case class IfThen(predicate: Condition, thenBlock: PosAST) extends ConditionThen
@@ -70,52 +66,57 @@ case class Equals(factName: String, factValue: String) extends Condition
 //END PARSER STUFFF
 
 trait POSCompilationError
-
 case class POSLexerError(msg: String) extends POSCompilationError
 case class POSParserError(msg: String) extends POSCompilationError
 
 
 object POSLexer extends RegexParsers {
-//    override def skipWhitespace = true
-//
-//    override val whiteSpace = "[ \t\r\f\n]+".r
-//
-//    //Reserved Words
-//    def createShop = "createShop" ^^ (_ => CREATESHOP)
-//    def renameShop = "renameShop" ^^ (_ => RENAMESHOP)
-//    def addItem = "addItem" ^^ (_ => ADDITEM)
-//    def deleteItem = "deleteItem" ^^ (_ => DELETEITEM)
-//    def updateInventory = "updateInventory" ^^ (_ => UPDATEINVENTORY)
-//    def addInventory = "addInventory" ^^ (_ => ADDINVENTORY)
-//    def removeInventory = "removeInventory" ^^ (_ => REMOVEINVENTORY)
-//    def updatePrice = "updatePrice" ^^ (_ => UPDATEPRICE)
-//    def updateCategory = "updateCategory" ^^ (_ => UPDATECATEGORY)
-//    def updatePhoto = "updatePhoto" ^^ (_ => UPDATEPHOTO)
-//    def setElementsGridDimensions = "setElementsGridDimensions" ^^ (_ => SETELEMENTSGRIDDIMENSIONS)
-//    def setCartSize = "setCartSize" ^^ (_ => SETCARTSIZE)
-//    def addToCart = "addToCart" ^^ (_ => ADDTOCART)
-//    def removeFromCart = "removeFromCart" ^^ (_ => REMOVEFROMCART)
-//
-//    def receiptHeader = "receiptHeader" ^^ (_ => RECEIPTHEADER)
-//    def reciptFooter = "reciptFooter" ^^ (_ => RECIPTFOOTER)
-//    def deleteHeader = "deleteHeader" ^^ (_ => DELETEHEADER)
-//    def deleteFooter = "deleteFooter" ^^ (_ => DELETEFOOTER)
-//
-//    def addUser = "addUser" ^^(_ => ADDUSER)
-//
-//    //Symbols
-//    def colon         = ":"             ^^ (_ => COLON)
-//    def comma         = ","             ^^ (_ => COMMA)
-//    def semiColon = ";" ^^(_ => SEMICOLON)
-//
+    override def skipWhitespace = true
+
+    override val whiteSpace = "[ \t\r\f\n]+".r
+
+    //Reserved Words
+    def createShop = "createShop" ^^ (_ => CREATESHOP)
+    def renameShop = "renameShop" ^^ (_ => RENAMESHOP)
+    def addItem = "addItem" ^^ (_ => ADDITEM)
+    def deleteItem = "deleteItem" ^^ (_ => DELETEITEM)
+    def updateInventory = "updateInventory" ^^ (_ => UPDATEINVENTORY)
+    def addInventory = "addInventory" ^^ (_ => ADDINVENTORY)
+    def removeInventory = "removeInventory" ^^ (_ => REMOVEINVENTORY)
+    def updatePrice = "updatePrice" ^^ (_ => UPDATEPRICE)
+    def updateCategory = "updateCategory" ^^ (_ => UPDATECATEGORY)
+    def updatePhoto = "updatePhoto" ^^ (_ => UPDATEPHOTO)
+    def setElementsGridDimensions = "setElementsGridDimensions" ^^ (_ => SETELEMENTSGRIDDIMENSIONS)
+    def addToCart = "addToCart" ^^ (_ => ADDTOCART)
+    def removeFromCart = "removeFromCart" ^^ (_ => REMOVEFROMCART)
+
+    def receiptHeader = "receiptHeader" ^^ (_ => RECEIPTHEADER)
+    def reciptFooter = "reciptFooter" ^^ (_ => RECIPTFOOTER)
+    def deleteHeader = "deleteHeader" ^^ (_ => DELETEHEADER)
+    def deleteFooter = "deleteFooter" ^^ (_ => DELETEFOOTER)
+
+    def addUser = "addUser" ^^(_ => ADDUSER)
+
+    //Symbols
+    def colon         = ":"             ^^ (_ => COLON)
+    def comma         = ","             ^^ (_ => COMMA)
+    //def semiColon = ";" ^^(_ => SEMICOLON)
+
 //    def string: Parser[POSToken] = {
-//        "\"[a-zA-Z_][a-zA-Z0-9_]*\"".r ^^ { str => STRING(str) }
+//        "\"[a-zA-Z_][a-zA-Z0-9_]*\"".r ^^ { str => STRING(str) } //maybe this one is better than the other string def, intente  la otra para dejar que los strings puedan tener espacios libremente
 //    }
-//
-//    def identifier: Parser[POSToken] = {
-//        "[a-zA-Z_][a-zA-Z0-9_]*".r ^^ { str => IDENTIFIER(str) }
-//    }
-//
+
+    def string: Parser[STRING] = {
+        """"[^"]*"""".r ^^ { str =>
+            val content = str.substring(1, str.length - 1)
+            STRING(content)
+        }
+    }
+
+    def identifier: Parser[POSToken] = {
+        "[a-zA-Z_][a-zA-Z0-9_]*".r ^^ { str => IDENTIFIER(str) }
+    }
+
 //    private def processIndentations(tokens: List[POSToken],
 //                                    indents: List[Int] = List(0)): List[POSToken] = {
 //        tokens.headOption match {
@@ -146,72 +147,87 @@ object POSLexer extends RegexParsers {
 //
 //        }
 //    }
-//
-//    def tokens: Parser[List[POSToken]] = {
-//        phrase(rep1(createShop | addItem | colon | comma | semiColon)) ^^ { rawTokens =>
-//            processIndentations(rawTokens)
-//        }
-//    }
-//
-//    def apply(code: String): Either[POSLexerError, List[POSToken]] = {
-//        parse(tokens, code) match {
-//            case NoSuccess(msg, next) => Left(POSLexerError(msg))
-//            case Success(result, next) => Right(result)
-//        }
-//    }
-//}
-//
-//class POSTokenReader(tokens: Seq[POSToken]) extends Reader[POSToken] {
-//    def first: POSToken = tokens.head
-//    def atEnd: Boolean = tokens.isEmpty
-//    override def pos: Position = NoPosition
-//    override def rest: Reader[POSToken] = new POSTokenReader(tokens.tail)
-//}
-//
-//object POSParser extends RegexParsers {
-//    override type Elem = POSToken
-//
-//    def program: Parser[PosAST] = {
-//        phrase(block)
-//    }
-//
-//    def block: Parser[PosAST] = {
-//        rep1(statement) ^^ { case stmtList => stmtList reduceRight AndThen }
-//    }
-//
-//    def statement: POSParser.Parser[POSToken ~ POSToken ~ POSToken] = {
-//        val createShop = CREATESHOP ~ COLON ~ SEMICOLON
-//        val renameShop = RENAMESHOP ~ COLON ~ SEMICOLON //val renameShop = RENAMESHOP ~ COLON ~ rep(STRING) ~ SEMICOLON
-//        createShop | renameShop
-//    }
-//
-//    def apply(tokens: Seq[POSToken]): Either[POSParserError, PosAST] = {
-//        val reader = new POSTokenReader(tokens)
-//        program(reader) match {
-//            case NoSuccess(msg, next) => Left(POSParserError(msg))
-//            case Success(result, next) => Right(result)
-//        }
-//    }
-//}
-//
-//object POSCompiler {
-//    def apply(code: String): Either[POSCompilationError, PosAST] = {
-//        for {
-//            tokens <- POSLexer(code).right
-//            ast <- POSParser(tokens).right
-//        } yield ast
-//    }
-//}
-//
-//
-//object TestLexParser {
-//    def main(args: Array[String]): Unit = {
-//
-//        val fileName = "TestFile"
-//        var fileContent = Source.fromFile(fileName).getLines.mkString;
-//
-//        println(POSLexer.apply("createShop"))
-//
-//        println(POSParser.statement)
-//    }
+
+    def tokens: Parser[List[POSToken]] = {
+        phrase(rep1(createShop | addItem | colon | comma | semiColon)) ^^ { rawTokens =>
+            //processIndentations(rawTokens) //we have to make this return a list of tokens. o sea que esta parte sea like another token that "contains" a list of tokens
+            ALLTOKENS(rawTokens)
+        }
+    }
+
+    def apply(code: String): Either[POSLexerError, List[POSToken]] = {
+        parse(tokens, code) match {
+            case NoSuccess(msg, next) => Left(POSLexerError(msg))
+            case Success(result, next) => Right(result)
+        }
+    }
+}
+
+class POSTokenReader(tokens: Seq[POSToken]) extends Reader[POSToken] {
+    def first: POSToken = tokens.head
+    def atEnd: Boolean = tokens.isEmpty
+    override def pos: Position = NoPosition
+    override def rest: Reader[POSToken] = new POSTokenReader(tokens.tail)
+}
+
+object POSParser extends RegexParsers {
+    override type Elem = POSToken
+
+    def program: Parser[PosAST] = {
+        phrase(source)
+    }
+
+    def source: Parser[PosAST] = {
+        rep1(expression) ^^ { case expList => expList reduceRight Execute } //replaced AndThen with Execute (pensando que lo que hace and then es escencialmente execute each step
+    }
+
+    def expression: Parser[PosAST] = {
+        val createShop = CREATESHOP ~ COLON ~ string ^^ {
+            case _ ~ _ ~ STRING(str) => CreateShop(str)
+            case _ ~ _ ~ None => CreateShopEmpty()
+        }
+        val renameShop = RENAMESHOP ~ COLON ~ string ^^ { //val renameShop = RENAMESHOP ~ COLON ~ rep(STRING) ~ SEMICOLON
+            case _ ~ _ ~ STRING(str) => RenameShop(str)
+        }
+        val addItem = ADDITEM ~ COLON ~ identifier ~ COMMA ~ identifier ~ COMMA ~ identifier ~ COMMA ~ identifier ~ COMMA ~ identifier ^^ { //should we have separate parsers for numbers? instead of all being in identifier? how exactly do we handle photos?
+            case _ ~ _ ~ IDENTIFIER(category) ~ _ ~ IDENTIFIER(name) ~ _ ~ IDENTIFIER(photo) ~ _ ~ IDENTIFIER(invAmount) ~ _ ~ IDENTIFIER(price) => AddItem(category, name, photo, invAmount, price)
+        }
+        val deleteItem = DELETEITEM ~ COLON ~ identifier ^^ {
+            case _ ~ _ ~ IDENTIFIER(itemName) => DeleteItem(itemName)
+        }
+        val updateInventory = UPDATEINVENTORY ~ COLON ~ identifier ~ COMMA ~ identifier ^^ {
+            case _ ~ _ ~ IDENTIFIER(itemName) ~ _ ~ IDENTIFIER(newAmount) => UpdateInventory(itemName, newAmount)
+        }
+        createShop | renameShop | addItem | deleteItem | updateInventory
+    }
+
+    def apply(tokens: Seq[POSToken]): Either[POSParserError, PosAST] = {
+        val reader = new POSTokenReader(tokens)
+        program(reader) match {
+            case NoSuccess(msg, next) => Left(POSParserError(msg))
+            case Success(result, next) => Right(result)
+        }
+    }
+}
+
+object POSCompiler {
+    def apply(code: String): Either[POSCompilationError, PosAST] = {
+        for {
+            tokens <- POSLexer(code).right
+            ast <- POSParser(tokens).right
+        } yield ast
+    }
+}
+
+
+object TestLexParser {
+    def main(args: Array[String]): Unit = {
+
+        val fileName = "TestFile"
+        var fileContent = Source.fromFile(fileName).getLines.mkString;
+
+        println(POSLexer.apply("createShop"))
+
+        println(POSParser.statement)
+    }
 }
