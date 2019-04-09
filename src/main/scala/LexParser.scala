@@ -55,7 +55,19 @@ case class RenameShop(newName: String) extends PosAST
 case class AddItem(category: String, name: String, photo: String, invAmount: String, price: String) extends PosAST //shouldnt the number parameters be of type Int? could we put em here as strings and then handle the string and do something like toInt to it?
 case class DeleteItem(itemName: String) extends PosAST
 case class UpdateInventory(itemName: String, newAmount: String) extends PosAST
-
+case class AddInventory(itemName: String, amount: String) extends PosAST
+case class RemoveInventory(itemName: String, amount: String) extends PosAST
+case class UpdatePrice(itemName: String, newPrice: String) extends PosAST
+case class UpdateCategory(itemName: String, newCategory: String) extends PosAST
+case class UpdatePhoto(itemName: String, newPhoto: String) extends PosAST
+case class SetElementGridDimensions(dim1: String, dim2: String) extends PosAST
+case class AddToCart(itemName: String, quantity: String) extends PosAST
+case class RemoveFromCart(itemName: String, quantity: String) extends PosAST
+case class ReceiptHeader(header: String) extends PosAST
+case class ReceiptFooter(footer: String) extends PosAST
+case object DeleteHeader extends PosAST
+case object DeleteFooter extends PosAST
+case class AddUser(userName: String, userCategory: String) extends PosAST
 
 sealed trait ConditionThen { def thenBlock: PosAST }
 case class IfThen(predicate: Condition, thenBlock: PosAST) extends ConditionThen
@@ -182,6 +194,7 @@ object POSParser extends RegexParsers {
     }
 
     def expression: Parser[PosAST] = {
+      //ShopExp
         val createShop = CREATESHOP ~ COLON ~ string ^^ {
             case _ ~ _ ~ STRING(str) => CreateShop(str)
             case _ ~ _ ~ None => CreateShopEmpty()
@@ -189,6 +202,7 @@ object POSParser extends RegexParsers {
         val renameShop = RENAMESHOP ~ COLON ~ string ^^ { //val renameShop = RENAMESHOP ~ COLON ~ rep(STRING) ~ SEMICOLON
             case _ ~ _ ~ STRING(str) => RenameShop(str)
         }
+      //InvExp
         val addItem = ADDITEM ~ COLON ~ identifier ~ COMMA ~ identifier ~ COMMA ~ identifier ~ COMMA ~ identifier ~ COMMA ~ identifier ^^ { //should we have separate parsers for numbers? instead of all being in identifier? how exactly do we handle photos?
             case _ ~ _ ~ IDENTIFIER(category) ~ _ ~ IDENTIFIER(name) ~ _ ~ IDENTIFIER(photo) ~ _ ~ IDENTIFIER(invAmount) ~ _ ~ IDENTIFIER(price) => AddItem(category, name, photo, invAmount, price)
         }
@@ -198,7 +212,45 @@ object POSParser extends RegexParsers {
         val updateInventory = UPDATEINVENTORY ~ COLON ~ identifier ~ COMMA ~ identifier ^^ {
             case _ ~ _ ~ IDENTIFIER(itemName) ~ _ ~ IDENTIFIER(newAmount) => UpdateInventory(itemName, newAmount)
         }
-        createShop | renameShop | addItem | deleteItem | updateInventory
+        val addInventory = ADDINVENTORY ~ COLON ~ identifier ~ COMMA ~ identifier ^^ {
+          case _ ~ _ ~ IDENTIFIER(itemName) ~ _ ~ IDENTIFIER(quantity) => AddInventory(itemName, quantity)
+        }
+        val removeInventory = REMOVEINVENTORY ~ COLON ~ identifier ~ COMMA ~ identifier ^^ {
+          case _ ~ _ ~ IDENTIFIER(itemName) ~ _ ~ IDENTIFIER(quantity) => RemoveInventory(itemName, quantity)
+        }
+        val updatePrice = UPDATEPRICE ~ COLON ~ identifier ~ COMMA ~ identifier ^^ {
+          case _ ~ _ ~ IDENTIFIER(itemName) ~ _ ~ IDENTIFIER(newPrice) => UpdatePrice(itemName, newPrice)
+        }
+        val updateCategory = UPDATECATEGORY ~ COLON ~ identifier ~ COMMA ~ identifier ^^ {
+          case _ ~ _ ~ IDENTIFIER(itemName) ~ _ ~ IDENTIFIER(newCategory) => UpdateCategory(itemName, newCategory)
+        }
+        val updatePhoto = UPDATEPHOTO ~ COLON ~ identifier ~ COMMA ~ identifier ^^ {
+          case _ ~ _ ~ IDENTIFIER(itemName) ~ _ ~ IDENTIFIER(newPhoto) => UpdatePhoto(itemName, newPhoto)
+        }
+        val setElementGridDimensions = SETELEMENTGRIDDIMENSIONS ~ COLON ~ identifier ~ COMMA ~ identifier ^^ {
+          case _ ~ _ ~ IDENTIFIER(dim1) ~ _ ~ IDENTIFIER(dim2) => SetElementGridDimensions(dim1, dim2) //this function, along with its token and the prod. rule are subject to change depending on how the backend is implemented - similarly: other functions to deal with the gui and backend might arise
+        }
+        val addToCart = ADDTOCART ~ COLON ~ identifier ~ COMMA ~ identifier ^^ {
+          case _ ~ _ ~ IDENTIFIER(itemName) ~ _ ~ IDENTIFIER(quantity) => AddToCart(itemName, quantity)
+        }
+        val removeFromCart = REMOVEFROMCART ~ COLON ~ identifier ~ COMMA ~ identifier ^^ {
+          case _ ~ _ ~ IDENTIFIER(itemName) ~ _ ~ IDENTIFIER(quantity) => RemoveFromCart(itemName, quantity)
+        }
+      //ReceiptExp
+        val receiptHeader = RECEIPTHEADER ~ COLON ~ string ^^ {
+        case _ ~ _ ~ STRING(header) => ReceiptHeader(header)
+        }
+        val receiptFooter = RECEIPTFOOTER ~ COLON ~ string ^^ {
+          case _ ~ _ ~ STRING(footer) => ReceiptFooter(footer)
+        }
+        val deleteHeader = DELETEHEADER ^^ (_ => DeleteHeader) //the DeleteHeader AST is an object, not a class
+        val deleteFooter = DELETEFOOTER ^^ (_ => DeleteFooter)
+      //AccExp
+        val addUser = ADDUSER ~ COLON ~ identifier ~ COMMA ~ identifier ^^ {
+          case _ ~ _ ~ IDENTIFIER(userName) ~ _ ~ IDENTIFIER(userCategory) => AddUser(userName, userCategory)
+        }
+
+        createShop | renameShop | addItem | deleteItem | updateInventory | addInventory | removeInventory | updatePrice | updateCategory | updatePhoto | setElementGridDimensions | addToCart | removeFromCart | receiptHeader | receiptFooter | deleteHeader | deleteFooter | addUser
     }
 
     def apply(tokens: Seq[POSToken]): Either[POSParserError, PosAST] = {
