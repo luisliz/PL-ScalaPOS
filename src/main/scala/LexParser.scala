@@ -13,7 +13,7 @@ case class STRING(str: String) extends POSToken
 case class ALLTOKENS(rawTokens: List[POSToken]) extends POSToken
 
 case object COLON extends POSToken
-//case object SEMICOLON extends POSToken
+case object SEMICOLON extends POSToken
 case object COMMA extends POSToken
 
 //case class INDENTATION(spaces: Int) extends POSToken
@@ -160,10 +160,50 @@ object POSLexer extends RegexParsers {
 //        }
 //    }
 
+//  def processIndentations(tokens: List[POSToken],
+//  //                                    indents: List[Int] = List(0)): List[POSToken] = {
+//  //        tokens.headOption match {
+//  //
+//  //            // if there is an increase in indentation level, we push this new level into the stack
+//  //            // and produce an INDENT
+//  //            case Some(INDENTATION(spaces)) if spaces > indents.head =>
+//  //                INDENT :: processIndentations(tokens.tail, spaces :: indents)
+//  //
+//  //            // if there is a decrease, we pop from the stack until we have matched the new level,
+//  //            // producing a DEDENT for each pop
+//  //            case Some(INDENTATION(spaces)) if spaces < indents.head =>
+//  //                val (dropped, kept) = indents.partition(_ > spaces)
+//  //                (dropped map (_ => DEDENT)) ::: processIndentations(tokens.tail, kept)
+//  //
+//  //            // if the indentation level stays unchanged, no tokens are produced
+//  //            case Some(INDENTATION(spaces)) if spaces == indents.head =>
+//  //                processIndentations(tokens.tail, indents)
+//  //
+//  //            // other tokens are ignored
+//  //            case Some(token) =>
+//  //                token :: processIndentations(tokens.tail, indents)
+//  //
+//  //            // the final step is to produce a DEDENT for each indentation level still remaining, thus
+//  //            // "closing" the remaining open INDENTS
+//  //            case None =>
+//  //                indents.filter(_ > 0).map(_ => DEDENT)
+//  //
+//  //        }
+//  //    }
+
+    def processTokens(tokens: List[POSToken]): List[POSToken] = {
+          var results: List[POSToken];
+          results :: processTokens(tokens.tail)
+
+      println(results)
+
+          return results;
+    }
+
     def tokens: Parser[List[POSToken]] = {
         phrase(rep1(createShop | addItem | colon | comma | semiColon)) ^^ { rawTokens =>
             //processIndentations(rawTokens) //we have to make this return a list of tokens. o sea que esta parte sea like another token that "contains" a list of tokens
-            ALLTOKENS(rawTokens)
+            processTokens(rawTokens)
         }
     }
 
@@ -195,15 +235,16 @@ object POSParser extends RegexParsers {
 
     def expression: Parser[PosAST] = {
       //ShopExp
-        val createShop = CREATESHOP ~ COLON ~ string ^^ {
+        val createShop = CREATESHOP ~ COLON ^^ { //~ rep(STRING) ^^ {
             case _ ~ _ ~ STRING(str) => CreateShop(str)
-            case _ ~ _ ~ None => CreateShopEmpty()
+            case _ ~ _ => CreateShopEmpty()
         }
-        val renameShop = RENAMESHOP ~ COLON ~ string ^^ { //val renameShop = RENAMESHOP ~ COLON ~ rep(STRING) ~ SEMICOLON
+        /*val renameShop = RENAMESHOP ~ COLON ^^ { //val renameShop = RENAMESHOP ~ COLON ~ rep(STRING) ~ SEMICOLON
             case _ ~ _ ~ STRING(str) => RenameShop(str)
-        }
+        }*/
       //InvExp
-        val addItem = ADDITEM ~ COLON ~ identifier ~ COMMA ~ identifier ~ COMMA ~ identifier ~ COMMA ~ identifier ~ COMMA ~ identifier ^^ { //should we have separate parsers for numbers? instead of all being in identifier? how exactly do we handle photos?
+
+        /*val addItem = ADDITEM ~ COLON ~ identifier ~ COMMA ~ identifier ~ COMMA ~ identifier ~ COMMA ~ identifier ~ COMMA ~ identifier ^^ { //should we have separate parsers for numbers? instead of all being in identifier? how exactly do we handle photos?
             case _ ~ _ ~ IDENTIFIER(category) ~ _ ~ IDENTIFIER(name) ~ _ ~ IDENTIFIER(photo) ~ _ ~ IDENTIFIER(invAmount) ~ _ ~ IDENTIFIER(price) => AddItem(category, name, photo, invAmount, price)
         }
         val deleteItem = DELETEITEM ~ COLON ~ identifier ^^ {
@@ -229,28 +270,31 @@ object POSParser extends RegexParsers {
         }
         val setElementGridDimensions = SETELEMENTGRIDDIMENSIONS ~ COLON ~ identifier ~ COMMA ~ identifier ^^ {
           case _ ~ _ ~ IDENTIFIER(dim1) ~ _ ~ IDENTIFIER(dim2) => SetElementGridDimensions(dim1, dim2) //this function, along with its token and the prod. rule are subject to change depending on how the backend is implemented - similarly: other functions to deal with the gui and backend might arise
-        }
-        val addToCart = ADDTOCART ~ COLON ~ identifier ~ COMMA ~ identifier ^^ {
-          case _ ~ _ ~ IDENTIFIER(itemName) ~ _ ~ IDENTIFIER(quantity) => AddToCart(itemName, quantity)
-        }
-        val removeFromCart = REMOVEFROMCART ~ COLON ~ identifier ~ COMMA ~ identifier ^^ {
-          case _ ~ _ ~ IDENTIFIER(itemName) ~ _ ~ IDENTIFIER(quantity) => RemoveFromCart(itemName, quantity)
-        }
-      //ReceiptExp
-        val receiptHeader = RECEIPTHEADER ~ COLON ~ string ^^ {
-        case _ ~ _ ~ STRING(header) => ReceiptHeader(header)
-        }
-        val receiptFooter = RECEIPTFOOTER ~ COLON ~ string ^^ {
-          case _ ~ _ ~ STRING(footer) => ReceiptFooter(footer)
-        }
-        val deleteHeader = DELETEHEADER ^^ (_ => DeleteHeader) //the DeleteHeader AST is an object, not a class
-        val deleteFooter = DELETEFOOTER ^^ (_ => DeleteFooter)
-      //AccExp
-        val addUser = ADDUSER ~ COLON ~ identifier ~ COMMA ~ identifier ^^ {
-          case _ ~ _ ~ IDENTIFIER(userName) ~ _ ~ IDENTIFIER(userCategory) => AddUser(userName, userCategory)
-        }
+        }*/
 
-        createShop | renameShop | addItem | deleteItem | updateInventory | addInventory | removeInventory | updatePrice | updateCategory | updatePhoto | setElementGridDimensions | addToCart | removeFromCart | receiptHeader | receiptFooter | deleteHeader | deleteFooter | addUser
+       /* val addToCart = ADDTOCART ~ COLON ~ _ ~ COMMA ^^ {
+            case _ ~ _ ~ IDENTIFIER(itemName) ~ _ ~ IDENTIFIER(quantity) => AddToCart(itemName, quantity)
+          }
+            val removeFromCart = REMOVEFROMCART ~ COLON ~ _ ~ COMMA ^^ {
+              case _ ~ _ ~ IDENTIFIER(itemName) ~ _ ~ IDENTIFIER(quantity) => RemoveFromCart(itemName, quantity)
+            }
+            //ReceiptExp
+            val receiptHeader = RECEIPTHEADER ~ COLON ^^ {
+              case _ ~ _ ~ STRING(header) => ReceiptHeader(header)
+            }
+
+            /*val receiptFooter = RECEIPTFOOTER ~ COLON ^^ {
+              case _ ~ _ ~ STRING(footer) => ReceiptFooter(footer)
+            }*/
+
+            val deleteHeader = DELETEHEADER ^^ (_ => DeleteHeader) //the DeleteHeader AST is an object, not a class
+            val deleteFooter = DELETEFOOTER ^^ (_ => DeleteFooter)
+            //AccExp
+            val addUser = ADDUSER ~ COLON ~ _ ~ COMMA ~ _ ^^ {
+              case _ ~ _ ~ IDENTIFIER(userName) ~ _ ~ IDENTIFIER(userCategory) => AddUser(userName, userCategory)
+        }*/
+
+        createShop /*| renameShop | addItem | deleteItem | updateInventory | addInventory | removeInventory | updatePrice | updateCategory | updatePhoto | setElementGridDimensions | addToCart | removeFromCart | receiptHeader | receiptFooter | deleteHeader | deleteFooter | addUser*/
     }
 
     def apply(tokens: Seq[POSToken]): Either[POSParserError, PosAST] = {
@@ -279,7 +323,5 @@ object TestLexParser {
         var fileContent = Source.fromFile(fileName).getLines.mkString;
 
         println(POSLexer.apply("createShop"))
-
-        println(POSParser.statement)
     }
 }
