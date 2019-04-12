@@ -41,10 +41,13 @@ class ShopWindow(name: String) extends MainFrame{
 
   private var totalLabel = new Label("Total: $" + transactionTotal)
 
-  contents = new BorderPanel {
-    /** Left Panel - Product Display*/
-    add(new FlowPanel() {
+  contents = new BoxPanel(Orientation.Vertical) {
+
+    contents += Button("Checkout") { checkout() }
+    contents += new FlowPanel() {
+      //Testing how to add items
       for (i <- itemList) {
+
         contents += new BoxPanel(Orientation.Vertical) {
           var addToCartButton = Button(i.name) { addToCart(i, this) }
           addToCartButton.enabled_=(i.inventory > 0)
@@ -57,24 +60,12 @@ class ShopWindow(name: String) extends MainFrame{
           border = Swing.MatteBorder(1, 1, 1, 1, java.awt.Color.BLACK)
         }
       }
-    }, BorderPanel.Position.Center)
+    } // End items section
+    contents += totalLabel
 
-    /** Right Panel - Invoice Display*/
-    val invoice = new BoxPanel(Orientation.Vertical){
-      for (i <- itemList) {
-        contents += new BoxPanel(Orientation.Vertical) {
-          var addToCartButton = Button("Added Item") { addToCart(i, this) }
-          addToCartButton.enabled_=(i.inventory > 0)
-          contents += addToCartButton
-        }
-      }
+  } // End contents
 
-    }
-    invoice.background = new Color(255,255,255) //set background white
-    add(invoice, BorderPanel.Position.East)
-  }
 
-  /** Change main screen name */
   def renameShop(newName: String): Unit = {
     title = newName
   }
