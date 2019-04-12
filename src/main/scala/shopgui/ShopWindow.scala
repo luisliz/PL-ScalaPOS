@@ -37,17 +37,12 @@ class ShopWindow(name: String) extends MainFrame{
     "This is the default receiptFooter. To change it type the command 'receiptFooter: [new footer]' in the console."
 
   /* Items in cart */
-  private var cart = new ListBuffer[Item]
+  private var cart:Map[Item,Int] = Map()
+//  private var cart = new ListBuffer[Item]
+
   /* Panel containing the cart, will be updated after entries */
   private val cartPanel = new BoxPanel(Orientation.Vertical) {
-      contents += new BoxPanel(Orientation.Horizontal) {
-        contents += Swing.HStrut(10)
-        contents += new Button("X")
-        contents += Swing.HStrut(10)
-        contents += new Label("Product")
-        border = Swing.MatteBorder(1, 1, 1, 1, java.awt.Color.BLACK)
-        contents += Swing.HStrut(10)
-      }
+      contents += new BoxPanel(Orientation.Horizontal) {}
   }
 
   /* MainFrame class actions */
@@ -133,8 +128,8 @@ class ShopWindow(name: String) extends MainFrame{
       boxPanel.contents.update(0, newButton)
     }
 
-    //add item to cart collection
-    cart += item
+    //add item to cart collection (includes quantity as map value)
+    if(cart.contains(item)) cart += (item -> (cart(item)+1)) else (cart += (item -> 1))
 
     //update displayed cart
     updateCart()
@@ -145,18 +140,22 @@ class ShopWindow(name: String) extends MainFrame{
   }
 
   private def updateCart(): Unit ={
-    val p = new BoxPanel(Orientation.Vertical) {
-      contents += new BoxPanel(Orientation.Horizontal) {
-        contents += Swing.HStrut(10)
-        contents += new Button("X")
-        contents += Swing.HStrut(10)
-        contents += new Label("Productssss")
-        border = Swing.MatteBorder(1, 1, 1, 1, java.awt.Color.BLACK)
-        contents += Swing.HStrut(10)
+    val p = new ScrollPane(new BoxPanel(Orientation.Vertical) {
+      println(cart)
+      for ((k,v) <- cart) {
+        println(s"key: $k, value: $v")
+        contents += new BoxPanel(Orientation.Horizontal) {
+          contents += Swing.HStrut(10)
+          contents += new Button("X")
+          contents += Swing.HStrut(10)
+          contents += new Label(k.name + " (" + v + " * " + k.price + ")")
+          contents += Swing.HStrut(10)
+        }
       }
-    }
+    })
     (cartPanel.contents).update(0, p)
     cartPanel.repaint()
+//    cartPanel.revalidate()
   }
 
   private def addToTotal(amountToAdd: Double): Unit = {
