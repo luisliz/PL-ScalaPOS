@@ -18,7 +18,7 @@ class ShopWindow(name: String) extends MainFrame{
   /** Constructor if no name is passed */
   def this() = this("SPCS")
 
-//  private var itemList = List[Item]()
+  //  private var itemList = List[Item]()
   // Just testing :)
   private var itemList = List(new Item("idk", "coca-cola", "123", 10, 0.99),
     new Item("idk", "arroz", "123", 54, 2.99),
@@ -41,13 +41,10 @@ class ShopWindow(name: String) extends MainFrame{
 
   private var totalLabel = new Label("Total: $" + transactionTotal)
 
-  contents = new BoxPanel(Orientation.Vertical) {
-
-    contents += Button("Checkout") { checkout() }
-    contents += new FlowPanel() {
-      //Testing how to add items
+  contents = new BorderPanel {
+    /** Left Panel - Product Display*/
+    add(new FlowPanel() {
       for (i <- itemList) {
-
         contents += new BoxPanel(Orientation.Vertical) {
           var addToCartButton = Button(i.name) { addToCart(i, this) }
           addToCartButton.enabled_=(i.inventory > 0)
@@ -60,12 +57,24 @@ class ShopWindow(name: String) extends MainFrame{
           border = Swing.MatteBorder(1, 1, 1, 1, java.awt.Color.BLACK)
         }
       }
-    } // End items section
-    contents += totalLabel
+    }, BorderPanel.Position.Center)
 
-  } // End contents
+    /** Right Panel - Invoice Display*/
+    val invoice = new BoxPanel(Orientation.Vertical){
+      for (i <- itemList) {
+        contents += new BoxPanel(Orientation.Vertical) {
+          var addToCartButton = Button("Added Item") { addToCart(i, this) }
+          addToCartButton.enabled_=(i.inventory > 0)
+          contents += addToCartButton
+        }
+      }
 
+    }
+    invoice.background = new Color(255,255,255) //set background white
+    add(invoice, BorderPanel.Position.East)
+  }
 
+  /** Change main screen name */
   def renameShop(newName: String): Unit = {
     title = newName
   }
@@ -113,7 +122,7 @@ class ShopWindow(name: String) extends MainFrame{
 
     // update amount left label
     updateAmountLabel(item, boxPanel)
-//    println(item.inventory)
+    //    println(item.inventory)
 
   }
 
@@ -138,7 +147,7 @@ class ShopWindow(name: String) extends MainFrame{
 
     // update amount left label
     updateAmountLabel(item, boxPanel)
-//    println(item.inventory)
+    //    println(item.inventory)
 
   }
   /* This doesn't have a condition for if the total gets to be less than 0 because the button should only be clickable with items that
@@ -151,11 +160,11 @@ class ShopWindow(name: String) extends MainFrame{
 
   private def updateAmountLabel(item: Item, boxPanel: BoxPanel): Unit = {
     val newAmountLeft = new Label("Amount left: " + item.inventory)
-//    val elements = boxPanel.contents.toArray
+    //    val elements = boxPanel.contents.toArray
     //println(elements(4))
     boxPanel.contents.update(4, newAmountLeft)
-//    val elements2 = boxPanel.contents.toArray
-//    println(elements2(4).toString())
+    //    val elements2 = boxPanel.contents.toArray
+    //    println(elements2(4).toString())
     boxPanel.repaint()
   }
 
