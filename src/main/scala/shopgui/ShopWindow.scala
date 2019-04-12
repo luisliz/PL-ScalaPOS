@@ -1,5 +1,6 @@
 package shopgui
 
+import scala.collection.mutable.ListBuffer
 import scala.swing._
 
 class ShopWindow(name: String) extends MainFrame{
@@ -35,6 +36,20 @@ class ShopWindow(name: String) extends MainFrame{
   private var receiptFooter = "Thank you for shopping with us! \n" +
     "This is the default receiptFooter. To change it type the command 'receiptFooter: [new footer]' in the console."
 
+  /* Items in cart */
+  private var cart = new ListBuffer[Item]
+  /* Panel containing the cart, will be updated after entries */
+  private val cartPanel = new BoxPanel(Orientation.Vertical) {
+      contents += new BoxPanel(Orientation.Horizontal) {
+        contents += Swing.HStrut(10)
+        contents += new Button("X")
+        contents += Swing.HStrut(10)
+        contents += new Label("Product")
+        border = Swing.MatteBorder(1, 1, 1, 1, java.awt.Color.BLACK)
+        contents += Swing.HStrut(10)
+      }
+  }
+
   /* MainFrame class actions */
   title = name
   preferredSize = new Dimension(800, 500)
@@ -60,15 +75,13 @@ class ShopWindow(name: String) extends MainFrame{
     }, BorderPanel.Position.Center)
 
     /** Right Panel - Invoice Display*/
-    val invoice = new BoxPanel(Orientation.Vertical){
-      for (i <- itemList) {
-        contents += new BoxPanel(Orientation.Vertical) {
-          var addToCartButton = Button("Added Item") { addToCart(i, this) }
-          addToCartButton.enabled_=(i.inventory > 0)
-          contents += addToCartButton
-        }
-      }
+    var invoice = new BorderPanel {
+      add(cartPanel, BorderPanel.Position.Center)
 
+      add(new FlowPanel {
+        contents += totalLabel
+        contents += new Button("Checkout")
+      }, BorderPanel.Position.South)
     }
     invoice.background = new Color(255,255,255) //set background white
     add(invoice, BorderPanel.Position.East)
@@ -120,10 +133,30 @@ class ShopWindow(name: String) extends MainFrame{
       boxPanel.contents.update(0, newButton)
     }
 
+    //add item to cart collection
+    cart += item
+
+    //update displayed cart
+    updateCart()
+
     // update amount left label
     updateAmountLabel(item, boxPanel)
     //    println(item.inventory)
+  }
 
+  private def updateCart(): Unit ={
+    val p = new BoxPanel(Orientation.Vertical) {
+      contents += new BoxPanel(Orientation.Horizontal) {
+        contents += Swing.HStrut(10)
+        contents += new Button("X")
+        contents += Swing.HStrut(10)
+        contents += new Label("Productssss")
+        border = Swing.MatteBorder(1, 1, 1, 1, java.awt.Color.BLACK)
+        contents += Swing.HStrut(10)
+      }
+    }
+    (cartPanel.contents).update(0, p)
+    cartPanel.repaint()
   }
 
   private def addToTotal(amountToAdd: Double): Unit = {
