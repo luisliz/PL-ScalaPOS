@@ -1,5 +1,7 @@
 package shopgui
 
+import javax.swing.{Icon, ImageIcon}
+
 import scala.collection.mutable.ListBuffer
 import scala.swing._
 
@@ -38,7 +40,6 @@ class ShopWindow(name: String) extends MainFrame{
 
   /* Items in cart */
   private var cart:Map[Item,Int] = Map()
-//  private var cart = new ListBuffer[Item]
 
   /* Panel containing the cart, will be updated after entries */
   private val cartPanel = new BoxPanel(Orientation.Vertical) {
@@ -56,12 +57,16 @@ class ShopWindow(name: String) extends MainFrame{
     add(new FlowPanel() {
       for (i <- itemList) {
         contents += new BoxPanel(Orientation.Vertical) {
-          var addToCartButton = Button(i.name) { addToCart(i, this) }
+          var addToCartButton = Button("") { addToCart(i, this) }
           addToCartButton.enabled_=(i.inventory > 0)
+          addToCartButton.icon_=(new ImageIcon("src/media/products/avestruz.jpg"))
+//          addToCartButton.maximumSize_=(new Dimension(100, 100))
           contents += addToCartButton
-          contents += Swing.VStrut(10)
+          contents += Swing.VStrut(5)
+          contents += new Label(i.name)
+          contents += Swing.VStrut(5)
           contents += new Label("$" + i.price)
-          contents += Swing.VStrut(10)
+          contents += Swing.VStrut(5)
           contents += new Label("Amount left: " + i.inventory)
           contents += Button("Remove from cart") { removeFromCart(i, this) }
           border = Swing.MatteBorder(1, 1, 1, 1, java.awt.Color.BLACK)
