@@ -197,11 +197,8 @@ class ShopWindow(name: String) extends MainFrame{
 
   private def updateAmountLabel(item: Item, boxPanel: BoxPanel): Unit = {
     val newAmountLeft = new Label("Amount left: " + item.inventory)
-    //    val elements = boxPanel.contents.toArray
-    //println(elements(4))
-    boxPanel.contents.update(4, newAmountLeft)
-    //    val elements2 = boxPanel.contents.toArray
-    //    println(elements2(4).toString())
+    boxPanel.contents.update(6, newAmountLeft)
+    println(boxPanel.contents)
     boxPanel.repaint()
   }
 
