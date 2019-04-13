@@ -68,7 +68,9 @@ class ShopWindow(name: String) extends MainFrame{
           contents += new Label("$" + i.price)
           contents += Swing.VStrut(5)
           contents += new Label("Amount left: " + i.inventory)
-          contents += Button("Remove from cart") { removeFromCart(i, this) }
+          var removeCartButton = Button("Remove from cart") { removeFromCart(i, this) }
+          removeCartButton.enabled_=(false)
+          contents += removeCartButton
           border = Swing.MatteBorder(1, 1, 1, 1, java.awt.Color.BLACK)
         }
       }
@@ -126,7 +128,7 @@ class ShopWindow(name: String) extends MainFrame{
     item.removeInventory(1)
     println("inventory: " + item.inventory)
 
-    // disable button if necessary
+    // disable add button if necessary
     if (item.inventory <= 0) {
       val newButton = boxPanel.contents.head
       newButton.enabled_=(false)
@@ -135,6 +137,14 @@ class ShopWindow(name: String) extends MainFrame{
 
     //add item to cart collection (includes quantity as map value)
     if(cart.contains(item)) cart += (item -> (cart(item)+1)) else (cart += (item -> 1))
+
+    // disable remove button if necessary
+    if (cart.contains(item)) {
+      val newButton = Button("Remove from cart") { removeFromCart(item, boxPanel) }
+      newButton.enabled_=(true)
+      boxPanel.contents.update(7, newButton)
+      boxPanel.repaint()
+    }
 
     //update displayed cart
     updateCart()
@@ -146,7 +156,7 @@ class ShopWindow(name: String) extends MainFrame{
 
   private def updateCart(): Unit ={
     val p = new ScrollPane(new BoxPanel(Orientation.Vertical) {
-      println(cart)
+//      println(cart)
       for ((k,v) <- cart) {
         println(s"key: $k, value: $v")
         contents += new BoxPanel(Orientation.Horizontal) {
@@ -182,6 +192,25 @@ class ShopWindow(name: String) extends MainFrame{
       boxPanel.contents.update(0, newButton)
     }
 
+    //add item to cart collection (includes quantity as map value)
+    if(cart.contains(item)) {
+      if (cart(item) == 1)
+        cart -= (item)
+      else
+        cart += (item -> (cart(item) - 1))
+    }
+
+    // disable remove button if necessary
+    if (!cart.contains(item)) {
+      val newButton = Button("Remove from cart") { removeFromCart(item, boxPanel) }
+      newButton.enabled_=(false)
+      boxPanel.contents.update(7, newButton)
+      boxPanel.repaint()
+    }
+
+    //update displayed cart
+    updateCart()
+
     // update amount left label
     updateAmountLabel(item, boxPanel)
     //    println(item.inventory)
@@ -198,7 +227,7 @@ class ShopWindow(name: String) extends MainFrame{
   private def updateAmountLabel(item: Item, boxPanel: BoxPanel): Unit = {
     val newAmountLeft = new Label("Amount left: " + item.inventory)
     boxPanel.contents.update(6, newAmountLeft)
-    println(boxPanel.contents)
+//    println(boxPanel.contents)
     boxPanel.repaint()
   }
 
