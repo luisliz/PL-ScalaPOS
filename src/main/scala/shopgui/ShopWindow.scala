@@ -82,7 +82,7 @@ class ShopWindow(name: String) extends MainFrame{
 
       add(new FlowPanel {
         contents += totalLabel
-        contents += new Button("Checkout")
+        contents += Button("Checkout") { checkout() }
       }, BorderPanel.Position.South)
     }
     invoice.background = new Color(255,255,255) //set background white
@@ -114,12 +114,18 @@ class ShopWindow(name: String) extends MainFrame{
 
   /** Here you would pass the totals and the name of the items to pass to the receipt and then clear them for the next transaction */
   private def checkout(): Unit = {
-    displayReceipt()
-    transactionTotal = 0
+    if(cart.size > 0)
+      displayReceipt()
+      transactionTotal = 0
   }
 
   private def displayReceipt(): Unit = {
-    Dialog.showMessage(contents.head, receiptHeader + "\n\n\n\nContent for receipt goes here\n\n\n\n" + receiptFooter, title="Receipt")
+    var items = new StringBuilder()
+    for ((k,v) <- cart) {
+      items ++= k.name + " (quantity: " + v.toString + "   price: " + k.price.toString + ")\n"
+    }
+
+    Dialog.showMessage(contents.head, receiptHeader + "\n\n\n" + items + "\n\n" + receiptFooter, title="Receipt")
   }
 
   private def addToCart(item: Item, boxPanel: BoxPanel): Unit = {
