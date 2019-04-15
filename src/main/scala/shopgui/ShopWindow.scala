@@ -1,5 +1,7 @@
 package shopgui
 
+import java.awt.MediaTracker
+
 import javax.swing.{Icon, ImageIcon}
 
 import scala.collection.mutable.ListBuffer
@@ -23,13 +25,13 @@ class ShopWindow(name: String) extends MainFrame{
 
   //  private var itemList = List[Item]()
   // Just testing :)
-  private var itemList = List(new Item("idk", "coca-cola", "123", 10, 0.99),
-    new Item("idk", "arroz", "123", 54, 2.99),
-    new Item("idk", "pizza", "123", 49, 14.99),
-    new Item("idk", "coco", "123", 11, 2.99),
-    new Item("idk", "doritos", "123", 102, 1.37),
-    new Item("idk", "guitarra", "123", 22, 100),
-    new Item("idk", "avestruz", "123", 1, 100000))
+  private var itemList = List(new Item("idk", "coca-cola", "coa-cola.jpg", 10, 0.99),
+    new Item("idk", "arroz", "arroz.png", 54, 2.99),
+    new Item("idk", "pizza", "pizza.png", 49, 14.99),
+    new Item("idk", "coco", "coco.jpg", 11, 2.99),
+    new Item("idk", "doritos", "doritos.jpg", 102, 1.37),
+    new Item("idk", "guitarra", "guitarra.png", 22, 100),
+    new Item("idk", "avestruz", "avestruz.jpg", 1, 100000))
 
   private var transactionTotal: Double = 0
 
@@ -57,9 +59,11 @@ class ShopWindow(name: String) extends MainFrame{
     add(new FlowPanel() {
       for (i <- itemList) {
         contents += new BoxPanel(Orientation.Vertical) {
+          var icon = new ImageIcon("src/media/products/" + i.photo)
+          if(icon.getImageLoadStatus != MediaTracker.COMPLETE) icon = new ImageIcon("src/media/products/no-image.png")
           var addToCartButton = Button("") { addToCart(i, this) }
           addToCartButton.enabled_=(i.inventory > 0)
-          addToCartButton.icon_=(new ImageIcon("src/media/products/avestruz.jpg"))
+          addToCartButton.icon_=(icon)
 //          addToCartButton.maximumSize_=(new Dimension(100, 100))
           contents += addToCartButton
           contents += Swing.VStrut(5)
