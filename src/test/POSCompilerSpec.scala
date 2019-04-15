@@ -1,9 +1,8 @@
 import compiler.{Location, POSCompiler, POSParserError}
-import parser._
 import org.scalatest.{FlatSpec, Matchers}
+import parser._
 
 class POSCompilerSpec extends FlatSpec with Matchers {
-
   val validCode =
     """
       |read input name, country
@@ -41,22 +40,20 @@ class POSCompilerSpec extends FlatSpec with Matchers {
   val successfulAST = AndThen(
     ReadInput(List("name", "country")),
     Choice(List(
-      IfThen( Equals("country", "PT"), AndThen(CallService("A"), Exit) ),
+      IfThen(Equals("country", "PT"), AndThen(CallService("A"), Exit)),
       OtherwiseThen(
         AndThen(
           CallService("B"),
           Choice(List(
-            IfThen( Equals("name", "unknown"), Exit ),
-            OtherwiseThen( AndThen(CallService("C"), Exit) )
+            IfThen(Equals("name", "unknown"), Exit),
+            OtherwiseThen(AndThen(CallService("C"), Exit))
           ))
         )
       )
     ))
   )
 
-  val errorMsg = POSParserError(Location(3,14), "string literal expected")
-
-
+  val errorMsg = POSParserError(Location(3, 14), "string literal expected")
 
 
   "Workflow compiler" should "successfully parse a valid workflow" in {
@@ -66,5 +63,4 @@ class POSCompilerSpec extends FlatSpec with Matchers {
   it should "return an error with an invalid workflow" in {
     POSCompiler(invalidCode) shouldBe Left(errorMsg)
   }
-
 }
