@@ -191,19 +191,29 @@ object POSLexer extends RegexParsers {
 //  //        }
 //  //    }
 
-    def processTokens(tokens: List[POSToken]): List[POSToken] = {
-          var results: List[POSToken];
-          results :: processTokens(tokens.tail)
-
-      println(results)
-
-          return results;
+    def createShop = CREATESHOP ~ COLON  ~ rep(string) ^^ { //~ rep(STRING) ^^ {
+        //case _ ~ _ ~ STRING(str) => CreateShop(str)
+        case CREATESHOP => CreateShopEmpty()
     }
 
     def tokens: Parser[List[POSToken]] = {
-        phrase(rep1(createShop | addItem | colon | comma | semiColon)) ^^ { rawTokens =>
-            //processIndentations(rawTokens) //we have to make this return a list of tokens. o sea que esta parte sea like another token that "contains" a list of tokens
-            processTokens(rawTokens)
+        Parser(rep(createShop))/*| addItem | colon | comma *//*| semiColon*/
+    }
+
+    def number: Parser[Double] = """\d+(\.\d*)?""".r ^^ { _.toDouble }
+    def factor: Parser[Double] = number | "(" ~> expr <~ ")"
+
+    def term  : Parser[Double] = factor ~ rep( "*" ~ factor | "/" ~ factor) ^^ {
+        case number ~ list => (number /: list) {
+            case (x, "*" ~ y) => x * y
+            case (x, "/" ~ y) => x / y
+        }
+    }
+
+    def expr  : Parser[Double] = term ~ rep("+" ~ log(term)("Plus term") | "-" ~ log(term)("Minus term")) ^^ {
+        case number ~ list => list.foldLeft(number) { // same as before, using alternate name for /:
+            case (x, "+" ~ y) => x + y
+            case (x, "-" ~ y) => x - y
         }
     }
 
@@ -233,12 +243,14 @@ object POSParser extends RegexParsers {
         rep1(expression) ^^ { case expList => expList reduceRight Execute } //replaced AndThen with Execute (pensando que lo que hace and then es escencialmente execute each step
     }
 
+    def createShop = CREATESHOP /*~ COLON */^^ { //~ rep(STRING) ^^ {
+        //case _ ~ _ ~ STRING(str) => CreateShop(str)
+        case CREATESHOP => CreateShopEmpty()
+    }
+
     def expression: Parser[PosAST] = {
       //ShopExp
-        val createShop = CREATESHOP ~ COLON ^^ { //~ rep(STRING) ^^ {
-            case _ ~ _ ~ STRING(str) => CreateShop(str)
-            case _ ~ _ => CreateShopEmpty()
-        }
+
         /*val renameShop = RENAMESHOP ~ COLON ^^ { //val renameShop = RENAMESHOP ~ COLON ~ rep(STRING) ~ SEMICOLON
             case _ ~ _ ~ STRING(str) => RenameShop(str)
         }*/

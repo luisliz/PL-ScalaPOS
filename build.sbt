@@ -1,3 +1,5 @@
+import sbt.Keys.libraryDependencies
+
 name := "ScalaPOS"
 
 version := "0.1"
@@ -14,7 +16,9 @@ libraryDependencies := {
       libraryDependencies.value ++ Seq(
         "org.scala-lang.modules" %% "scala-xml" % "1.1.1",
         "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1",
-        "org.scala-lang.modules" %% "scala-swing" % "2.0.3")
+        "org.scala-lang.modules" %% "scala-swing" % "2.0.3",
+        "org.scalactic" %% "scalactic" % "3.0.5",
+        "org.scalatest" %% "scalatest" % "3.0.5" % "test")
     case Some((2, scalaMajor)) if scalaMajor >= 11 =>
       libraryDependencies.value ++ Seq(
         "org.scala-lang.modules" %% "scala-xml" % "1.1.1",
