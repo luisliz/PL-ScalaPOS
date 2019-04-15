@@ -23,7 +23,9 @@ libraryDependencies := {
       libraryDependencies.value ++ Seq(
         "org.scala-lang.modules" %% "scala-xml" % "1.1.1",
         "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1",
-        "org.scala-lang.modules" %% "scala-swing" % "1.0.2")
+        "org.scala-lang.modules" %% "scala-swing" % "1.0.2",
+        "org.scalactic" %% "scalactic" % "3.0.5",
+        "org.scalatest" %% "scalatest" % "3.0.5" % "test")
     case _ =>
       // or just libraryDependencies.value if you don't depend on scala-swing
       libraryDependencies.value :+ "org.scala-lang" % "scala-swing" % scalaVersion.value

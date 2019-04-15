@@ -2,16 +2,16 @@ package parser
 
 import scala.util.parsing.input.Positional
 
-sealed trait WorkflowAST extends Positional
-case class AndThen(step1: WorkflowAST, step2: WorkflowAST) extends WorkflowAST
-case class ReadInput(inputs: Seq[String]) extends WorkflowAST
-case class CallService(serviceName: String) extends WorkflowAST
-case class Choice(alternatives: Seq[ConditionThen]) extends WorkflowAST
-case object Exit extends WorkflowAST
+sealed trait POSAST extends Positional
+case class AndThen(step1: POSAST, step2: POSAST) extends POSAST
+case class ReadInput(inputs: Seq[String]) extends POSAST
+case class CallService(serviceName: String) extends POSAST
+case class Choice(alternatives: Seq[ConditionThen]) extends POSAST
+case object Exit extends POSAST
 
-sealed trait ConditionThen extends Positional { def thenBlock: WorkflowAST }
-case class IfThen(predicate: Condition, thenBlock: WorkflowAST) extends ConditionThen
-case class OtherwiseThen(thenBlock: WorkflowAST) extends ConditionThen
+sealed trait ConditionThen extends Positional { def thenBlock: POSAST }
+case class IfThen(predicate: Condition, thenBlock: POSAST) extends ConditionThen
+case class OtherwiseThen(thenBlock: POSAST) extends ConditionThen
 
 sealed trait Condition extends Positional
 case class Equals(factName: String, factValue: String) extends Condition

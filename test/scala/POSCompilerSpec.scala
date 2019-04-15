@@ -2,9 +2,10 @@ package test
 
 import compiler.{Location, POSCompiler, POSParserError}
 import parser._
+
 import org.scalatest.{FlatSpec, Matchers}
 
-class POSCompilerSpec extends FlatSpec with Matchers {
+class git POSCompilerSpec extends FlatSpec with Matchers {
 
   val validCode =
     """
@@ -57,9 +58,6 @@ class POSCompilerSpec extends FlatSpec with Matchers {
   )
 
   val errorMsg = POSParserError(Location(3,14), "string literal expected")
-
-
-
 
   "POS compiler" should "successfully parse a valid POS" in {
     POSCompiler(validCode) shouldBe Right(successfulAST)

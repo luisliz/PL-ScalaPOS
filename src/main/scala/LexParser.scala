@@ -1,3 +1,4 @@
+/*
 package lexParser
 
 import scala.util.parsing.combinator._
@@ -337,3 +338,4 @@ object TestLexParser {
         println(POSLexer.apply("createShop"))
     }
 }
+*/
