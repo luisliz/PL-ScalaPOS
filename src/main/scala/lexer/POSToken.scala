@@ -27,11 +27,6 @@ case class DOUBLE(double: Double) extends POSToken
 //case class ARROW() extends POSToken
 //case class EQUALS() extends POSToken
 //case class COMMA() extends POSToken
-case class INDENT() extends POSToken
-
-case class DEDENT() extends POSToken
-
-case class INDENTATION(spaces: Int) extends POSToken
 
 
 case class COLON() extends POSToken
