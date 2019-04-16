@@ -16,8 +16,11 @@ object POSLexer extends RegexParsers {
   }
 
   def tokens: Parser[List[POSToken]] = {
-    phrase(rep1(exit | readInput | callService | switch | otherwise | colon | arrow
-      | equals | comma | literal | identifier | indentation)) ^^ { rawTokens =>
+    phrase(rep1(
+       renameShop | addItem| deleteItem| updateInventory| addInventory| removeInventory|
+      updatePrice| updateCategory| updatePhoto| setElementsGridDimensions| addToCart| removeFromCart | receiptHeader|
+      reciptFooter| deleteHeader| deleteFooter | addUser | createShop
+    )) ^^ { rawTokens =>
       processIndentations(rawTokens)
     }
   }
@@ -28,7 +31,7 @@ object POSLexer extends RegexParsers {
 
       // if there is an increase in indentation level, we push this new level into the stack
       // and produce an INDENT
-      case Some(INDENTATION(spaces)) if spaces > indents.head =>
+     /* case Some(INDENTATION(spaces)) if spaces > indents.head =>
         INDENT() :: processIndentations(tokens.tail, spaces :: indents)
 
       // if there is a decrease, we pop from the stack until we have matched the new level and
@@ -39,7 +42,7 @@ object POSLexer extends RegexParsers {
 
       // if the indentation level stays unchanged, no tokens are produced
       case Some(INDENTATION(spaces)) if spaces == indents.head =>
-        processIndentations(tokens.tail, indents)
+        processIndentations(tokens.tail, indents)*/
 
       // other tokens are ignored
       case Some(token) =>
@@ -47,38 +50,57 @@ object POSLexer extends RegexParsers {
 
       // the final step is to produce a DEDENT for each indentation level still remaining, thus
       // "closing" the remaining open INDENTS
-      case None =>
-        indents.filter(_ > 0).map(_ => DEDENT())
+      /*case None =>
+        indents.filter(_ > 0).map(_ => DEDENT())*/
 
     }
   }
+
+
+
+  /*def indentation: Parser[INDENTATION] = positioned {
+    "\n[ ]*".r ^^ { whitespace =>
+      val nSpaces = whitespace.length - 1
+      INDENTATION(nSpaces)
+    }
+  }*/
+
+
+
+  def createShop    = positioned { "createshop" ^^ (_ => CREATESHOP()) }
+  def renameShop    = positioned { "renameShop" ^^ (_ => RENAMESHOP()) }
+  def addItem     = positioned { "addItem" ^^ (_ => ADDITEM()) }
+  def deleteItem    = positioned { "deleteItem" ^^ (_ => DELETEITEM()) }
+  def updateInventory     = positioned { "updateInventory" ^^ (_ => UPDATEINVENTORY()) }
+  def addInventory    = positioned { "addInventory" ^^ (_ => ADDINVENTORY()) }
+  def removeInventory     = positioned { "removeInventory" ^^ (_ => REMOVEINVENTORY()) }
+  def updatePrice     = positioned { "updatePrice" ^^ (_ => UPDATEPRICE()) }
+  def updateCategory    = positioned { "updateCategory" ^^ (_ => UPDATECATEGORY()) }
+  def updatePhoto     = positioned { "updatePhoto" ^^ (_ => UPDATEPHOTO()) }
+  def setElementsGridDimensions     = positioned { "setElementsGridDimensions" ^^ (_ => SETELEMENTSGRIDDIMENSIONS()) }
+  def addToCart     = positioned { "addToCart" ^^ (_ => ADDTOCART()) }
+  def removeFromCart    = positioned { "removeFromCart" ^^ (_ => REMOVEFROMCART()) }
+
+  def receiptHeader     = positioned { "receiptHeader" ^^ (_ => RECEIPTHEADER()) }
+  def reciptFooter    = positioned { "reciptFooter" ^^ (_ => RECIPTFOOTER()) }
+  def deleteHeader    = positioned { "deleteHeader" ^^ (_ => DELETEHEADER()) }
+  def deleteFooter    = positioned { "deleteFooter" ^^ (_ => DELETEFOOTER()) }
+
+  def addUser     = positioned { "addUser" ^^(_ => ADDUSER()) }
+
+  //Symbols
+  def colon             = positioned { ":"             ^^ (_ => COLON()) }
+  def comma             = positioned { ","             ^^ (_ => COMMA()) }
 
   def identifier: Parser[IDENTIFIER] = positioned {
     "[a-zA-Z_][a-zA-Z0-9_]*".r ^^ { str => IDENTIFIER(str) }
   }
 
-  def literal: Parser[LITERAL] = positioned {
+  def string: Parser[STRING] = positioned {
     """"[^"]*"""".r ^^ { str =>
       val content = str.substring(1, str.length - 1)
-      LITERAL(content)
+      STRING(content)
     }
   }
-
-  def indentation: Parser[INDENTATION] = positioned {
-    "\n[ ]*".r ^^ { whitespace =>
-      val nSpaces = whitespace.length - 1
-      INDENTATION(nSpaces)
-    }
-  }
-
-  def exit          = positioned { "exit"          ^^ (_ => EXIT()) }
-  def readInput     = positioned { "read input"    ^^ (_ => READINPUT()) }
-  def callService   = positioned { "call service"  ^^ (_ => CALLSERVICE()) }
-  def switch        = positioned { "switch"        ^^ (_ => SWITCH()) }
-  def otherwise     = positioned { "otherwise"     ^^ (_ => OTHERWISE()) }
-  def colon         = positioned { ":"             ^^ (_ => COLON()) }
-  def arrow         = positioned { "->"            ^^ (_ => ARROW()) }
-  def equals        = positioned { "=="            ^^ (_ => EQUALS()) }
-  def comma         = positioned { ","             ^^ (_ => COMMA()) }
 
 }

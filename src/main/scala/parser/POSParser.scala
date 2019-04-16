@@ -34,7 +34,16 @@ object POSParser extends Parsers {
   }
 
   def statement: Parser[POSAST] = positioned {
+
+    val createShop = CREATESHOP() ~ COLON() ~ string ^^ {
+      case _ ~ _ ~ STRING(str) => CreateShop(str)
+        //ShopExp ::= CREATESHOP COLON {STRING} | RENAMESHOP COLON STRING
+      //case _ => CreateShopEmpty()
+    }
+
+/*
     val exit = EXIT() ^^ (_ => Exit)
+
     val readInput = READINPUT() ~ rep(identifier ~ COMMA()) ~ identifier ^^ {
       case read ~ inputs ~ IDENTIFIER(lastInput) => ReadInput(inputs.map(_._1.str) ++ List(lastInput))
     }
@@ -43,11 +52,14 @@ object POSParser extends Parsers {
     }
     val switch = SWITCH() ~ COLON() ~ INDENT() ~ rep1(ifThen) ~ opt(otherwiseThen) ~ DEDENT() ^^ {
       case _ ~ _ ~ _ ~ ifs ~ otherwise ~ _ => Choice(ifs ++ otherwise)
-    }
-    exit | readInput | callService | switch
+    }*/
+
+    createShop
+
+    //exit | readInput | callService | switch
   }
 
-  def ifThen: Parser[IfThen] = positioned {
+  /*def ifThen: Parser[IfThen] = positioned {
     (condition ~ ARROW() ~ INDENT() ~ block ~ DEDENT()) ^^ {
       case cond ~ _ ~ _ ~ block ~ _ => IfThen(cond, block)
     }
@@ -61,14 +73,14 @@ object POSParser extends Parsers {
 
   def condition: Parser[Equals] = positioned {
     (identifier ~ EQUALS() ~ literal) ^^ { case IDENTIFIER(id) ~ eq ~ LITERAL(lit) => Equals(id, lit) }
-  }
+  }*/
 
   private def identifier: Parser[IDENTIFIER] = positioned {
     accept("identifier", { case id @ IDENTIFIER(name) => id })
   }
 
-  private def literal: Parser[LITERAL] = positioned {
-    accept("string literal", { case lit @ LITERAL(name) => lit })
+  private def string: Parser[STRING] = positioned {
+    accept("string", { case lit @ STRING(name) => lit })
   }
 
 }
