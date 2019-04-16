@@ -1,3 +1,5 @@
+/*
+/*
 package lexParser
 
 import scala.util.parsing.combinator._
@@ -5,45 +7,6 @@ import scala.util.parsing.input._
 import scala.io.Source
 
 sealed trait POSToken
-
-//START LEXER STUFF
-//The reserved tokens
-case class IDENTIFIER(str: String) extends POSToken
-case class STRING(str: String) extends POSToken
-case class ALLTOKENS(rawTokens: List[POSToken]) extends POSToken
-
-case object COLON extends POSToken
-case object SEMICOLON extends POSToken
-case object COMMA extends POSToken
-
-//case class INDENTATION(spaces: Int) extends POSToken
-//case object INDENT extends POSToken
-//case object DEDENT extends POSToken
-
-//shop tokens
-case object CREATESHOP extends POSToken
-case object RENAMESHOP extends POSToken
-case object ADDITEM extends POSToken
-case object DELETEITEM extends POSToken
-case object UPDATEINVENTORY extends POSToken
-case object ADDINVENTORY extends POSToken
-case object REMOVEINVENTORY extends POSToken
-case object UPDATEPRICE extends POSToken
-case object UPDATECATEGORY extends POSToken
-case object UPDATEPHOTO extends POSToken
-case object SETELEMENTSGRIDDIMENSIONS extends POSToken
-case object ADDTOCART extends POSToken
-case object REMOVEFROMCART extends POSToken
-
-//account management tokens (faltan mas)
-case object ADDUSER extends POSToken
-
-//receipt tokens
-case object RECEIPTHEADER extends POSToken
-case object RECIPTFOOTER extends POSToken
-case object DELETEHEADER extends POSToken
-case object DELETEFOOTER extends POSToken
-//FINISH LEXER STUFF
 
 
 //START PARSER STUFF
@@ -81,53 +44,8 @@ trait POSCompilationError
 case class POSLexerError(msg: String) extends POSCompilationError
 case class POSParserError(msg: String) extends POSCompilationError
 
-
-object POSLexer extends RegexParsers {
-    override def skipWhitespace = true
-
-    override val whiteSpace = "[ \t\r\f\n]+".r
-
-    //Reserved Words
-    def createShop = "createShop" ^^ (_ => CREATESHOP)
-    def renameShop = "renameShop" ^^ (_ => RENAMESHOP)
-    def addItem = "addItem" ^^ (_ => ADDITEM)
-    def deleteItem = "deleteItem" ^^ (_ => DELETEITEM)
-    def updateInventory = "updateInventory" ^^ (_ => UPDATEINVENTORY)
-    def addInventory = "addInventory" ^^ (_ => ADDINVENTORY)
-    def removeInventory = "removeInventory" ^^ (_ => REMOVEINVENTORY)
-    def updatePrice = "updatePrice" ^^ (_ => UPDATEPRICE)
-    def updateCategory = "updateCategory" ^^ (_ => UPDATECATEGORY)
-    def updatePhoto = "updatePhoto" ^^ (_ => UPDATEPHOTO)
-    def setElementsGridDimensions = "setElementsGridDimensions" ^^ (_ => SETELEMENTSGRIDDIMENSIONS)
-    def addToCart = "addToCart" ^^ (_ => ADDTOCART)
-    def removeFromCart = "removeFromCart" ^^ (_ => REMOVEFROMCART)
-
-    def receiptHeader = "receiptHeader" ^^ (_ => RECEIPTHEADER)
-    def reciptFooter = "reciptFooter" ^^ (_ => RECIPTFOOTER)
-    def deleteHeader = "deleteHeader" ^^ (_ => DELETEHEADER)
-    def deleteFooter = "deleteFooter" ^^ (_ => DELETEFOOTER)
-
-    def addUser = "addUser" ^^(_ => ADDUSER)
-
-    //Symbols
-    def colon         = ":"             ^^ (_ => COLON)
-    def comma         = ","             ^^ (_ => COMMA)
-    //def semiColon = ";" ^^(_ => SEMICOLON)
-
-//    def string: Parser[POSToken] = {
-//        "\"[a-zA-Z_][a-zA-Z0-9_]*\"".r ^^ { str => STRING(str) } //maybe this one is better than the other string def, intente  la otra para dejar que los strings puedan tener espacios libremente
-//    }
-
-    def string: Parser[STRING] = {
-        """"[^"]*"""".r ^^ { str =>
-            val content = str.substring(1, str.length - 1)
-            STRING(content)
-        }
-    }
-
-    def identifier: Parser[POSToken] = {
-        "[a-zA-Z_][a-zA-Z0-9_]*".r ^^ { str => IDENTIFIER(str) }
-    }
+*/
+//object POSLexer extends RegexParsers {
 
 //    private def processIndentations(tokens: List[POSToken],
 //                                    indents: List[Int] = List(0)): List[POSToken] = {
@@ -191,19 +109,29 @@ object POSLexer extends RegexParsers {
 //  //        }
 //  //    }
 
-    def processTokens(tokens: List[POSToken]): List[POSToken] = {
-          var results: List[POSToken];
-          results :: processTokens(tokens.tail)
-
-      println(results)
-
-          return results;
+    def createShop = CREATESHOP ~ COLON  ~ rep(string) ^^ { //~ rep(STRING) ^^ {
+        //case _ ~ _ ~ STRING(str) => CreateShop(str)
+        case CREATESHOP => CreateShopEmpty()
     }
 
     def tokens: Parser[List[POSToken]] = {
-        phrase(rep1(createShop | addItem | colon | comma | semiColon)) ^^ { rawTokens =>
-            //processIndentations(rawTokens) //we have to make this return a list of tokens. o sea que esta parte sea like another token that "contains" a list of tokens
-            processTokens(rawTokens)
+        Parser(rep(createShop))/*| addItem | colon | comma *//*| semiColon*/
+    }
+
+    def number: Parser[Double] = """\d+(\.\d*)?""".r ^^ { _.toDouble }
+    def factor: Parser[Double] = number | "(" ~> expr <~ ")"
+
+    def term  : Parser[Double] = factor ~ rep( "*" ~ factor | "/" ~ factor) ^^ {
+        case number ~ list => (number /: list) {
+            case (x, "*" ~ y) => x * y
+            case (x, "/" ~ y) => x / y
+        }
+    }
+
+    def expr  : Parser[Double] = term ~ rep("+" ~ log(term)("Plus term") | "-" ~ log(term)("Minus term")) ^^ {
+        case number ~ list => list.foldLeft(number) { // same as before, using alternate name for /:
+            case (x, "+" ~ y) => x + y
+            case (x, "-" ~ y) => x - y
         }
     }
 
@@ -214,7 +142,7 @@ object POSLexer extends RegexParsers {
         }
     }
 }
-
+/*
 class POSTokenReader(tokens: Seq[POSToken]) extends Reader[POSToken] {
     def first: POSToken = tokens.head
     def atEnd: Boolean = tokens.isEmpty
@@ -233,12 +161,10 @@ object POSParser extends RegexParsers {
         rep1(expression) ^^ { case expList => expList reduceRight Execute } //replaced AndThen with Execute (pensando que lo que hace and then es escencialmente execute each step
     }
 
+
     def expression: Parser[PosAST] = {
       //ShopExp
-        val createShop = CREATESHOP ~ COLON ^^ { //~ rep(STRING) ^^ {
-            case _ ~ _ ~ STRING(str) => CreateShop(str)
-            case _ ~ _ => CreateShopEmpty()
-        }
+
         /*val renameShop = RENAMESHOP ~ COLON ^^ { //val renameShop = RENAMESHOP ~ COLON ~ rep(STRING) ~ SEMICOLON
             case _ ~ _ ~ STRING(str) => RenameShop(str)
         }*/
@@ -325,3 +251,5 @@ object TestLexParser {
         println(POSLexer.apply("createShop"))
     }
 }
+*/
+*/
