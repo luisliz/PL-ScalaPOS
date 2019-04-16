@@ -11,8 +11,11 @@ object POSParser extends Parsers {
 
   class POSTokenReader(tokens: Seq[POSToken]) extends Reader[POSToken] {
     override def first: POSToken = tokens.head
+
     override def atEnd: Boolean = tokens.isEmpty
+
     override def pos: Position = tokens.headOption.map(_.pos).getOrElse(NoPosition)
+
     override def rest: Reader[POSToken] = new POSTokenReader(tokens.tail)
   }
 
@@ -33,63 +36,29 @@ object POSParser extends Parsers {
     rep1(statement) ^^ { case stmtList => stmtList reduceRight AndThen }
   }
 
-  def statement: Parser[POSAST] = positioned {
-
-    val createShop = CREATESHOP() ~ COLON() ~ string ^^ {
-      case _ ~ _ ~ STRING(str) => CreateShop(str)
-        //ShopExp ::= CREATESHOP COLON {STRING} | RENAMESHOP COLON STRING
-      //case _ => CreateShopEmpty()
-    }
-
-    val addItem = ADDITEM() ~ COLON() ~ string ~ COMMA() ~ string ~ COMMA() ~ string ~ COMMA() ~ digit ~ COMMA() ~ double ^^ { //i think photo should have its own regex (token) and there should also be numbers
-      case _ ~ _ ~ STRING(category) ~ _ ~ STRING(name) ~ _ ~ STRING(photo) ~ _ ~ DIGIT(invAmount) ~ _ ~ DOUBLE(price) => AddItem(category, name, photo, invAmount, price)
-    }
-
-/*
-    val exit = EXIT() ^^ (_ => Exit)
-
-    val callService = CALLSERVICE() ~ literal ^^ {
-      case call ~ LITERAL(serviceName) => CallService(serviceName)
-    }
-    val switch = SWITCH() ~ COLON() ~ INDENT() ~ rep1(ifThen) ~ opt(otherwiseThen) ~ DEDENT() ^^ {
-      case _ ~ _ ~ _ ~ ifs ~ otherwise ~ _ => Choice(ifs ++ otherwise)
-    }*/
-
-    addItem | createShop
-
-    //exit | readInput | callService | switch
-  }
-
-  /*def ifThen: Parser[IfThen] = positioned {
-    (condition ~ ARROW() ~ INDENT() ~ block ~ DEDENT()) ^^ {
-      case cond ~ _ ~ _ ~ block ~ _ => IfThen(cond, block)
-    }
-  }
-
-  def otherwiseThen: Parser[OtherwiseThen] = positioned {
-    (OTHERWISE() ~ ARROW() ~ INDENT() ~ block ~ DEDENT()) ^^ {
-      case _ ~ _ ~ _ ~ block ~ _ => OtherwiseThen(block)
-    }
-  }
-
-  def condition: Parser[Equals] = positioned {
-    (identifier ~ EQUALS() ~ literal) ^^ { case IDENTIFIER(id) ~ eq ~ LITERAL(lit) => Equals(id, lit) }
-  }*/
-
-  private def identifier: Parser[IDENTIFIER] = positioned {
-    accept("identifier", { case id @ IDENTIFIER(name) => id })
-  }
-
   private def string: Parser[STRING] = positioned {
-    accept("string", { case lit @ STRING(name) => lit })
+    accept("string", { case lit@STRING(name) => lit })
   }
 
   private def digit: Parser[DIGIT] = positioned {
-    accept("digit", { case num @ DIGIT(name) => num })
+    accept("digit", { case num@DIGIT(name) => num })
   }
 
   private def double: Parser[DOUBLE] = positioned {
-    accept("double", { case d @ DOUBLE(name) => d })
+    accept("double", { case d@DOUBLE(name) => d })
   }
 
+  def statement: Parser[POSAST] = positioned {
+
+    val createShop = CREATESHOP() ~ COLON() ~ string ~ SEMICOLON() ^^ {
+      case _ ~ _ ~ STRING(str) ~ _ => CreateShop(str)
+      //case _ => CreateShopEmpty()
+    }
+
+    val addItem = ADDITEM() ~ COLON() ~ string ~ COMMA() ~ string ~ COMMA() ~ string ~ COMMA() ~ digit ~ COMMA() ~ double ~ SEMICOLON() ^^ { //i think photo should have its own regex (token) and there should also be numbers
+      case _ ~ _ ~ STRING(category) ~ _ ~ STRING(name) ~ _ ~ STRING(photo) ~ _ ~ DIGIT(invAmount) ~ _ ~ DOUBLE(price) ~ _ => AddItem(category, name, photo, invAmount, price)
+    }
+
+    createShop | addItem
+  }
 }
