@@ -84,7 +84,7 @@ object POSLexer extends RegexParsers {
 
 
 
-  def createShop    = positioned { "createShop" ^^ (_ => CREATESHOP()) }
+  def createShop    = positioned { "createshop" ^^ (_ => CREATESHOP()) }
   def renameShop    = positioned { "renameShop" ^^ (_ => RENAMESHOP()) }
   def addItem     = positioned { "addItem" ^^ (_ => ADDITEM()) }
   def deleteItem    = positioned { "deleteItem" ^^ (_ => DELETEITEM()) }
