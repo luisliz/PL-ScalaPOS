@@ -8,6 +8,12 @@ object POSLexer extends RegexParsers {
   override def skipWhitespace = true
   override val whiteSpace = "[ \t\r\f]+".r
 
+//  def rawListWrapper(rawTokens: List[POSToken]): List[POSToken]{
+//    val listOfTokens:List[POSToken] = rawTokens ::: List()
+//    rawTokens ::: listOfTokens
+//    return listOfTokens
+//  }
+
   def apply(code: String): Either[POSLexerError, List[POSToken]] = {
     parse(tokens, code) match {
       case NoSuccess(msg, next) => Left(POSLexerError(Location(next.pos.line, next.pos.column), msg))
@@ -17,13 +23,24 @@ object POSLexer extends RegexParsers {
 
   def tokens: Parser[List[POSToken]] = {
     phrase(rep1(
-       renameShop | addItem| deleteItem| updateInventory| addInventory| removeInventory|
-      updatePrice| updateCategory| updatePhoto| setElementsGridDimensions| addToCart| removeFromCart | receiptHeader|
-      reciptFooter| deleteHeader| deleteFooter | addUser | createShop
+        renameShop | addItem | deleteItem | updateInventory | addInventory | removeInventory |
+        updatePrice | updateCategory | updatePhoto | setElementsGridDimensions | addToCart | removeFromCart | receiptHeader |
+        reciptFooter | deleteHeader | deleteFooter | addUser | createShop  | colon | comma | string | identifier | double | digit
     )) ^^ { rawTokens =>
       processIndentations(rawTokens)
     }
   }
+
+//  def tokens: Parser[List[POSToken]] = {
+//    phrase(rep1(
+//      identifier | string | renameShop | addItem | deleteItem | updateInventory | addInventory | removeInventory |
+//        updatePrice | updateCategory | updatePhoto | setElementsGridDimensions | addToCart | removeFromCart | receiptHeader |
+//        reciptFooter | deleteHeader | deleteFooter | addUser | colon | createShop
+//    )) ^^ { rawTokens =>
+//      rawListWrapper(rawTokens)
+//    }
+//  }
+
 
   private def processIndentations(tokens: List[POSToken],
                                   indents: List[Int] = List(0)): List[POSToken] = {
@@ -31,7 +48,7 @@ object POSLexer extends RegexParsers {
 
       // if there is an increase in indentation level, we push this new level into the stack
       // and produce an INDENT
-     /* case Some(INDENTATION(spaces)) if spaces > indents.head =>
+     case Some(INDENTATION(spaces)) if spaces > indents.head =>
         INDENT() :: processIndentations(tokens.tail, spaces :: indents)
 
       // if there is a decrease, we pop from the stack until we have matched the new level and
@@ -42,7 +59,7 @@ object POSLexer extends RegexParsers {
 
       // if the indentation level stays unchanged, no tokens are produced
       case Some(INDENTATION(spaces)) if spaces == indents.head =>
-        processIndentations(tokens.tail, indents)*/
+        processIndentations(tokens.tail, indents)
 
       // other tokens are ignored
       case Some(token) =>
@@ -50,8 +67,8 @@ object POSLexer extends RegexParsers {
 
       // the final step is to produce a DEDENT for each indentation level still remaining, thus
       // "closing" the remaining open INDENTS
-      /*case None =>
-        indents.filter(_ > 0).map(_ => DEDENT())*/
+      case None =>
+        indents.filter(_ > 0).map(_ => DEDENT())
 
     }
   }
@@ -67,7 +84,7 @@ object POSLexer extends RegexParsers {
 
 
 
-  def createShop    = positioned { "createshop" ^^ (_ => CREATESHOP()) }
+  def createShop    = positioned { "createShop" ^^ (_ => CREATESHOP()) }
   def renameShop    = positioned { "renameShop" ^^ (_ => RENAMESHOP()) }
   def addItem     = positioned { "addItem" ^^ (_ => ADDITEM()) }
   def deleteItem    = positioned { "deleteItem" ^^ (_ => DELETEITEM()) }
@@ -91,10 +108,19 @@ object POSLexer extends RegexParsers {
   //Symbols
   def colon             = positioned { ":"             ^^ (_ => COLON()) }
   def comma             = positioned { ","             ^^ (_ => COMMA()) }
+  //testing by adding the quotation mark symbol
+  //def quote             = positioned { """"""" ^^ (_ => QUOTE()) }
 
   def identifier: Parser[IDENTIFIER] = positioned {
-    "[a-zA-Z_][a-zA-Z0-9_]*".r ^^ { str => IDENTIFIER(str) }
+    """[a-zA-Z_][a-zA-Z0-9_]*""".r ^^ { str => IDENTIFIER(str) }
   }
+
+  def digit: Parser[DIGIT] = positioned {
+    """[0-9_]+""".r ^^ { num => DIGIT(num.toInt) }
+  }
+
+  def double: Parser[DOUBLE] =
+    """[0-9]*[\.]?[0-9]+""".r  ^^ (s => DOUBLE(s.toDouble))
 
   def string: Parser[STRING] = positioned {
     """"[^"]*"""".r ^^ { str =>
@@ -102,5 +128,11 @@ object POSLexer extends RegexParsers {
       STRING(content)
     }
   }
+
+//  def string: Parser[STRING] = positioned {
+//    quote ~> """[^"]*""".r <~ quote ^^ { str =>
+//      STRING(str)
+//    }
+//  }
 
 }

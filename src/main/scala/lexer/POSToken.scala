@@ -9,6 +9,8 @@ case class IDENTIFIER(str: String) extends POSToken
 //case class INDENTATION(spaces: Int) extends POSToken
 
 case class STRING(str: String) extends POSToken
+case class DIGIT(digit: Int) extends POSToken
+case class DOUBLE(double: Double) extends POSToken
 //case class ALLTOKENS(rawTokens: List[POSToken]) extends POSToken
 
 
@@ -21,14 +23,18 @@ case class STRING(str: String) extends POSToken
 //case class ARROW() extends POSToken
 //case class EQUALS() extends POSToken
 //case class COMMA() extends POSToken
-//case class INDENT() extends POSToken
-//case class DEDENT() extends POSToken
+case class INDENT() extends POSToken
+case class DEDENT() extends POSToken
+case class INDENTATION(spaces: Int) extends POSToken
 
 
 
 case class COLON() extends POSToken
 case class SEMICOLON() extends POSToken
 case class COMMA() extends POSToken
+//testing quote token
+case class QUOTE() extends POSToken
+
 
 
 //shop tokens

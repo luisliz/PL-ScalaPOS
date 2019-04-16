@@ -11,9 +11,13 @@ object Main {
 
     val validCode =
       """
-        |createshop: "createshop"
+       addItem: "food", "arroz", "arroz.jpg", 300, 1.50
       """.stripMargin.trim;
 
+    //createShop: "MyShop"
+    //addItem: "food", "arroz", arroz.jpg, 300, 1.50
+
     println(POSLexer.apply(validCode).toString)
+    //println(POSCompiler.apply(validCode).toString)
   }
 }

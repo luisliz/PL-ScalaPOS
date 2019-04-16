@@ -41,6 +41,10 @@ object POSParser extends Parsers {
       //case _ => CreateShopEmpty()
     }
 
+    val addItem = ADDITEM() ~ COLON() ~ string ~ COMMA() ~ string ~ COMMA() ~ string ~ COMMA() ~ digit ~ COMMA() ~ double ^^ { //i think photo should have its own regex (token) and there should also be numbers
+      case _ ~ _ ~ STRING(category) ~ _ ~ STRING(name) ~ _ ~ STRING(photo) ~ _ ~ DIGIT(invAmount) ~ _ ~ DOUBLE(price) => AddItem(category, name, photo, invAmount, price)
+    }
+
 /*
     val exit = EXIT() ^^ (_ => Exit)
 
@@ -54,7 +58,7 @@ object POSParser extends Parsers {
       case _ ~ _ ~ _ ~ ifs ~ otherwise ~ _ => Choice(ifs ++ otherwise)
     }*/
 
-    createShop
+    addItem | createShop
 
     //exit | readInput | callService | switch
   }
@@ -81,6 +85,14 @@ object POSParser extends Parsers {
 
   private def string: Parser[STRING] = positioned {
     accept("string", { case lit @ STRING(name) => lit })
+  }
+
+  private def digit: Parser[DIGIT] = positioned {
+    accept("digit", { case num @ DIGIT(name) => num })
+  }
+
+  private def double: Parser[DOUBLE] = positioned {
+    accept("double", { case d @ DOUBLE(name) => d })
   }
 
 }

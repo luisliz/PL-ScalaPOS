@@ -18,3 +18,4 @@ case class AndThen(step1: POSAST, step2: POSAST) extends POSAST
 
 case class CreateShop(shopName: String) extends POSAST
 case class CreateShopEmpty() extends POSAST
+case class AddItem(category: String, name: String, photo: String, invAmount: Int, price: Double) extends POSAST
