@@ -25,7 +25,7 @@ object POSLexer extends RegexParsers {
     phrase(rep1(
         renameShop | addItem | deleteItem | updateInventory | addInventory | removeInventory |
         updatePrice | updateCategory | updatePhoto | setElementsGridDimensions | addToCart | removeFromCart | receiptHeader |
-        reciptFooter | deleteHeader | deleteFooter | addUser | createShop  | colon | comma | string | identifier | double | digit
+        reciptFooter | deleteHeader | deleteFooter | addUser | createShop  | colon | comma | string | identifier | double | digit | indentation
     )) ^^ { rawTokens =>
       processIndentations(rawTokens)
     }
@@ -75,12 +75,12 @@ object POSLexer extends RegexParsers {
 
 
 
-  /*def indentation: Parser[INDENTATION] = positioned {
+  def indentation: Parser[INDENTATION] = positioned {
     "\n[ ]*".r ^^ { whitespace =>
       val nSpaces = whitespace.length - 1
       INDENTATION(nSpaces)
     }
-  }*/
+  }
 
 
 

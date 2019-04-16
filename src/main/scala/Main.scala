@@ -11,7 +11,8 @@ object Main {
 
     val validCode =
       """
-       addItem: "food", "arroz", "arroz.jpg", 300, 1.50
+         createShop: "MyShop"
+         addItem: "food", "arroz", "arroz.jpg", 300, 1.50
       """.stripMargin.trim;
 
     //createShop: "MyShop"
