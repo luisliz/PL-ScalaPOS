@@ -36,6 +36,60 @@ object POSParser extends Parsers {
     rep1(statement) ^^ { case stmtList => stmtList reduceRight AndThen }
   }
 
+  def statement: Parser[POSAST] = positioned {
+    val createShop = CREATESHOP() ~ COLON() ~ string ~ SEMICOLON() ^^ {
+      case _ ~ _ ~ STRING(str) ~ _ => CreateShop(str)
+    }
+
+    val header = RECEIPTHEADER() ~ COLON() ~ string ~ SEMICOLON() ^^ {
+      case _ ~ _ ~ STRING(str) ~ _ => CreateHeader(str)
+    }
+
+    val footer = RECEIPTFOOTER() ~ COLON() ~ string ~ SEMICOLON() ^^ {
+      case _ ~ _ ~ STRING(str) ~ _ => CreateFooter(str)
+    }
+
+    val addItem = ADDITEM() ~ COLON() ~ string ~ COMMA() ~ string ~ COMMA() ~ string ~ COMMA() ~ digit ~ COMMA() ~ double ~ SEMICOLON() ^^ { //i think photo should have its own regex (token) and there should also be numbers
+      case _ ~ _ ~ STRING(category) ~ _ ~ STRING(name) ~ _ ~ STRING(photo) ~ _ ~ DIGIT(invAmount) ~ _ ~ DOUBLE(price) ~ _ => AddItem(category, name, photo, invAmount, price)
+    }
+
+    val format = createShop ~ header ~ addItem ~ footer ^^ {
+      case _ ~ _ ~ _ ~ _ => openStore()
+    }
+
+
+
+    format  //| receiptExp | AccExp
+  }
+
+
+  def InventoryExp: Parser[POSAST] = positioned {
+    val addItem = ADDITEM() ~ COLON() ~ string ~ COMMA() ~ string ~ COMMA() ~ string ~ COMMA() ~ digit ~ COMMA() ~ double ~ SEMICOLON() ^^ { //i think photo should have its own regex (token) and there should also be numbers
+      case _ ~ _ ~ STRING(category) ~ _ ~ STRING(name) ~ _ ~ STRING(photo) ~ _ ~ DIGIT(invAmount) ~ _ ~ DOUBLE(price) ~ _ => AddItem(category, name, photo, invAmount, price)
+    }
+
+    addItem
+  }
+
+/*
+  def receiptExp: Parser[POSAST] = positioned {
+    val receipt = CREATESHOP() ~ COLON() ~ string ~ SEMICOLON() ^^ {
+      case _ ~ _ ~ STRING(str) ~ _ => CreateShop(str)
+      //case _ => CreateShopEmpty()
+    }
+
+    receipt
+  }
+
+  def AccExp: Parser[POSAST] = positioned {
+    val Acc = CREATESHOP() ~ COLON() ~ string ~ SEMICOLON() ^^ {
+      case _ ~ _ ~ STRING(str) ~ _ => CreateShop(str)
+      //case _ => CreateShopEmpty()
+    }
+
+    Acc
+  }*/
+
   private def string: Parser[STRING] = positioned {
     accept("string", { case lit@STRING(name) => lit })
   }
@@ -48,17 +102,5 @@ object POSParser extends Parsers {
     accept("double", { case d@DOUBLE(name) => d })
   }
 
-  def statement: Parser[POSAST] = positioned {
 
-    val createShop = CREATESHOP() ~ COLON() ~ string ~ SEMICOLON() ^^ {
-      case _ ~ _ ~ STRING(str) ~ _ => CreateShop(str)
-      //case _ => CreateShopEmpty()
-    }
-
-    val addItem = ADDITEM() ~ COLON() ~ string ~ COMMA() ~ string ~ COMMA() ~ string ~ COMMA() ~ digit ~ COMMA() ~ double ~ SEMICOLON() ^^ { //i think photo should have its own regex (token) and there should also be numbers
-      case _ ~ _ ~ STRING(category) ~ _ ~ STRING(name) ~ _ ~ STRING(photo) ~ _ ~ DIGIT(invAmount) ~ _ ~ DOUBLE(price) ~ _ => AddItem(category, name, photo, invAmount, price)
-    }
-
-    createShop | addItem
-  }
 }

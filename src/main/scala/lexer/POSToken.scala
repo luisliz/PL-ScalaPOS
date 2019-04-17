@@ -72,7 +72,7 @@ case class ADDUSER() extends POSToken
 //receipt tokens
 case class RECEIPTHEADER() extends POSToken
 
-case class RECIPTFOOTER() extends POSToken
+case class RECEIPTFOOTER() extends POSToken
 
 case class DELETEHEADER() extends POSToken
 
