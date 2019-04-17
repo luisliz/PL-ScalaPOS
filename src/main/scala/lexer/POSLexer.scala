@@ -24,9 +24,6 @@ object POSLexer extends RegexParsers {
     ))
   }
 
-  def identifier: Parser[IDENTIFIER] = positioned {
-    """[a-zA-Z_][a-zA-Z0-9_]*""".r ^^ { str => IDENTIFIER(str) }
-  }
 
   def comma                 = positioned {"," ^^ (_ => COMMA())}
 
@@ -47,7 +44,7 @@ object POSLexer extends RegexParsers {
   def removeFromCart= positioned { "removeFromCart" ^^ (_ => REMOVEFROMCART()) }
 
   def receiptHeader   = positioned { "receiptHeader" ^^ (_ => RECEIPTHEADER()) }
-  def reciptFooter     = positioned { "reciptFooter" ^^ (_ => RECIPTFOOTER()) }
+  def reciptFooter     = positioned { "reciptFooter" ^^ (_ => RECEIPTFOOTER()) }
   def deleteHeader     = positioned { "deleteHeader" ^^ (_ => DELETEHEADER()) }
   def deleteFooter     = positioned { "deleteFooter" ^^ (_ => DELETEFOOTER()) }
 
@@ -60,11 +57,14 @@ object POSLexer extends RegexParsers {
 
   def digit: Parser[DIGIT] = positioned {"""[0-9_]+""".r ^^ { num => DIGIT(num.toInt) }}
 
-  def string: Parser[STRING] = positioned {""""[^"]*"""".r ^^ { str =>
+  def string: Parser[STRING] = positioned {"""".*"""".r ^^ { str =>
                                     val content = str.substring(1, str.length - 1)
                                     STRING(content)
                                   }
                                 }
 
+  def identifier: Parser[IDENTIFIER] = positioned {
+    """[a-zA-Z_][a-zA-Z0-9_]*""".r ^^ { str => IDENTIFIER(str) }
+  }
 
 }

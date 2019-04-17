@@ -18,7 +18,12 @@ case class AndThen(step1: POSAST, step2: POSAST) extends POSAST
 //sealed trait Condition extends Positional
 //case class Equals(factName: String, factValue: String) extends Condition
 
+case class openStore() extends POSAST
+
 case class CreateShop(shopName: String) extends POSAST
+
+case class CreateHeader(footText: String) extends POSAST
+case class CreateFooter(footText: String) extends POSAST
 
 case class CreateShopEmpty() extends POSAST
 

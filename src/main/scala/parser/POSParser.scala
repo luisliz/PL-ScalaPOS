@@ -36,28 +36,30 @@ object POSParser extends Parsers {
     rep1(statement) ^^ { case stmtList => stmtList reduceRight AndThen }
   }
 
-  private def string: Parser[STRING] = positioned {
-    accept("string", { case lit@STRING(name) => lit })
-  }
-
-  private def digit: Parser[DIGIT] = positioned {
-    accept("digit", { case num@DIGIT(name) => num })
-  }
-
-  private def double: Parser[DOUBLE] = positioned {
-    accept("double", { case d@DOUBLE(name) => d })
-  }
-
-  def shopExp: Parser[POSAST] = positioned {
+  def statement: Parser[POSAST] = positioned {
     val createShop = CREATESHOP() ~ COLON() ~ string ~ SEMICOLON() ^^ {
       case _ ~ _ ~ STRING(str) ~ _ => CreateShop(str)
     }
 
-    val renameShop = RENAMESHOP() ~ COLON() ~ string ~ SEMICOLON() ^^ {
-      case _ ~ _ ~ STRING(str) ~ _ => CreateShop(str)
+    val header = RECEIPTHEADER() ~ COLON() ~ string ~ SEMICOLON() ^^ {
+      case _ ~ _ ~ STRING(str) ~ _ => CreateHeader(str)
     }
 
-    createShop | renameShop
+    val footer = RECEIPTFOOTER() ~ COLON() ~ string ~ SEMICOLON() ^^ {
+      case _ ~ _ ~ STRING(str) ~ _ => CreateFooter(str)
+    }
+
+    val addItem = ADDITEM() ~ COLON() ~ string ~ COMMA() ~ string ~ COMMA() ~ string ~ COMMA() ~ digit ~ COMMA() ~ double ~ SEMICOLON() ^^ { //i think photo should have its own regex (token) and there should also be numbers
+      case _ ~ _ ~ STRING(category) ~ _ ~ STRING(name) ~ _ ~ STRING(photo) ~ _ ~ DIGIT(invAmount) ~ _ ~ DOUBLE(price) ~ _ => AddItem(category, name, photo, invAmount, price)
+    }
+
+    val format = createShop ~ header ~ addItem ~ footer ^^ {
+      case _ ~ _ ~ _ ~ _ => openStore()
+    }
+
+
+
+    format  //| receiptExp | AccExp
   }
 
 
@@ -69,7 +71,7 @@ object POSParser extends Parsers {
     addItem
   }
 
-
+/*
   def receiptExp: Parser[POSAST] = positioned {
     val receipt = CREATESHOP() ~ COLON() ~ string ~ SEMICOLON() ^^ {
       case _ ~ _ ~ STRING(str) ~ _ => CreateShop(str)
@@ -86,13 +88,19 @@ object POSParser extends Parsers {
     }
 
     Acc
+  }*/
+
+  private def string: Parser[STRING] = positioned {
+    accept("string", { case lit@STRING(name) => lit })
   }
 
-  def statement: Parser[POSAST] = positioned {
-    val init = shopExp ~ rep(InventoryExp)  ^^ {
-      case _ ~ _ => CreateShopEmpty()
-    }
-
-    init | InventoryExp | receiptExp | AccExp
+  private def digit: Parser[DIGIT] = positioned {
+    accept("digit", { case num@DIGIT(name) => num })
   }
+
+  private def double: Parser[DOUBLE] = positioned {
+    accept("double", { case d@DOUBLE(name) => d })
+  }
+
+
 }
