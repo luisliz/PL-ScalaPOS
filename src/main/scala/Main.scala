@@ -1,3 +1,5 @@
+import compiler.POSCompiler
+import lexer.POSLexer
 import shopgui.ShopWindow
 
 
@@ -9,10 +11,10 @@ object Main {
 
     val validCode =
     """
-    createShop: "Hey";
+    createShop: "MyShop";
     addItem: "food", "arroz", "arroz.jpg", 300, 1.50;
     """.stripMargin.trim;
-
+    //
 
     //
     //addItem: "food", "arroz", arroz.jpg, 300, 1.50

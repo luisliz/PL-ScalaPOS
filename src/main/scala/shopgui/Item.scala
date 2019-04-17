@@ -10,28 +10,33 @@ class Item(itemCategory: String, itemName: String, itemPhoto: String, itemInvent
   private var _price = if (itemPrice > 0) itemPrice else 0
 
   def name: String = _name
-  def name_= (newValue: String): Unit = {
+
+  def name_=(newValue: String): Unit = {
     _name = newValue
   }
 
   def category: String = _category
-  def category_= (newValue: String): Unit = {
+
+  def category_=(newValue: String): Unit = {
     _category = newValue
   }
 
   /** idk what to use for photos so im putting them as strings for now */
   def photo: String = _photo
-  def photo_= (newValue: String): Unit = {
+
+  def photo_=(newValue: String): Unit = {
     _photo = newValue
   }
 
   def inventory: Int = _inventory
-  def inventory_= (newValue: Int): Unit = {
+
+  def inventory_=(newValue: Int): Unit = {
     _inventory = if (newValue >= 0) newValue else _inventory
   }
 
   def price: Double = _price
-  def price_= (newValue: Double): Unit = {
+
+  def price_=(newValue: Double): Unit = {
     _price = if (newValue >= 0) newValue else _price
   }
 
