@@ -1,27 +1,27 @@
-/* Creates empty shop GUI with the given title */
-createShop: "My Shop";
+
+createShop: "My Shop"
 
 /* Adds specified item to the shop GUI */
-addItem: "food", "arroz", arroz.jpg, 300, 1.50;
-addItem: "drink, "cocacola", null, 500, 1;
+addItem: "food", "arroz", "arroz.jpg", 300, 1.50
+addItem: "drink", "cocacola", "null", 500, 1
 
 /* Adds or subtracts inventory to item */
-addInventory: "arroz", 3;
-removeInventory: "cocacola", 20;
+addInventory: "arroz", 3
+removeInventory: "cocacola", 20
 
 /* Overrides inventory with new parameters */
-updateInventory: "arroz", 200;
+updateInventory: "arroz", 200
 
 /* Overrides price */
-updatePrice: "arroz", 1.60;
+updatePrice: "arroz", 1.60
 
 /* Remove an item from the shop GUI */
-deleteItem: "cocacola";
+deleteItem: "coca cola"
 
 /* Set the string passed as an input as the receipt footer */
-receiptFooter: "Thank you for shopping with us"
+receiptFooter: "stuff"
 
-
+/*
 vvvvvvv ALL FUNCTIONS vvvvvvv
 
 openMenu        //default name
@@ -39,35 +39,36 @@ updatePrice: name, newPrice
 
 updateCategory: name, newCategory
 
-updatePhoto: name, newPhoto
+updatePhoto: "name", "newPhoto"
 
-receiptHeader: Something something header for receipt
-receiptFooter: Something something footer for receipt
+receiptHeader: "Something something header for receipt"
+receiptFooter: "Something something footer for receipt"
 deleteHeader
 deleteFooter
 
+*/
 
 
-
-/* Creates empty shop GUI with the given title */
-createShop: My Shop
+/* Creates empty shop GUI with the given title
+createShop: "My Shop"
+*/
 
 /* Adds specified item to the shop GUI */
-addItem: food, arroz, arroz.jpg, 300, 1.50
-addItem: drink, cocacola, null, 500, 1
+addItem: "food", "arroz", "arroz.jpg", 300, 1.50
+addItem: "drink", "cocacola", "null", 500, 1
 
 /* Adds or subtracts inventory to item */
-addInventory: arroz, 3
-removeInventory: cocacola, 20
+addInventory: "arroz", 3
+removeInventory: "cocacola", 20
 
 /* Overrides inventory with new parameters */
-updateInventory: arroz, 200
+updateInventory: "arroz", 200
 
 /* Overrides price */
-updatePrice: arroz, 1.60
+updatePrice: "arroz", 1.60
 
 /* Remove an item from the shop GUI */
-deleteItem: cocacola
+deleteItem: "cocacola"
 
 /* Set the inputed string as the receipt footer */
-recepitFooter: Thank you for shopping with us
+recepitFooter: "Thank you for shopping with us"
