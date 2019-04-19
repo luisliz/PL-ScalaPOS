@@ -39,7 +39,7 @@ object Main {
 
     val parser = new LexThisParseThat
 
-    val result = parser.parseAll(parser.expr, "openMenu:\"MyMenu\"")
+    val result = parser.parseAll(parser.expr, "createShop:\"MyMenu\" renameShop:\"Lol\"")
 
     println(result.get)
   }

@@ -4,24 +4,31 @@ import scala.util.parsing.combinator.RegexParsers
 
 class LexThisParseThat extends RegexParsers {
 
-  val ourString = "[A-Za-z]+".r
+  val string = "[A-Za-z]+".r
 
-  val comillas = "\"".r
+  val comilla = "\"".r
 
-  def expr: Parser[Any] = "openMenu" ~ opt(":" ~ comillas ~ ourString ~ comillas) ^^ {
+  var gui = new ShopWindow
+
+  def expr: Parser[Any] =  createShop ~ opt(rep(expr)) | renameShop
+
+  def createShop: Parser[Any] = "createShop" ~ opt(":" ~ comilla ~ string ~ comilla) ^^ {
 
     case a ~ None => {
-      val gui = new ShopWindow
       gui.visible = true
     }
 
     case a ~ Some(":" ~ "\"" ~ b ~ "\"") => {
-      val gui = new ShopWindow(b)
-//      gui.addItem(new Item("food", "food", "coco.jpg", 10, 20))
+      gui = new ShopWindow(b)
+      //      gui.addItem(new Item("food", "food", "coco.jpg", 10, 20))
       gui.visible = true
     }
+  }
 
-
+  def renameShop: Parser[Any] = "renameShop:" ~ comilla ~ string ~ comilla ^^ {
+    case "renameShop:" ~ "\"" ~ b ~"\"" => {
+      gui.renameShop(b)
+    }
   }
 
 }
