@@ -1,21 +1,22 @@
 import compiler.POSCompiler
 import lexer.POSLexer
-import shopgui.ShopWindow
+import shopgui.{Item, ShopWindow}
 
 
 object Main {
   def main(args: Array[String]) {
-    val gui = new ShopWindow
-    gui.visible = false
-    println("End of main function")
-
-    val validCode =
-      """
-      createShop: "My Shop";
-      receiptHeader: "Welcome to SHOP";
-      addItem: "food", "arroz", "arroz.jpg", 300, 1.50;
-      receiptFooter: "Thank you for shopping with us";
-      """.stripMargin.trim;
+//    val gui = new ShopWindow
+//    gui.addItem(new Item("food", "arroz2", "arroz.jpg", 300, 1.50))
+//    gui.visible = true
+//    println("End of main function")
+//
+//    val validCode =
+//      """
+//      createShop: "My Shop";
+//      receiptHeader: "Welcome to SHOP";
+//      addItem: "food", "arroz", "arroz.jpg", 300, 1.50;
+//      receiptFooter: "Thank you for shopping with us";
+//      """.stripMargin.trim;
 
     /*
 
@@ -31,8 +32,14 @@ object Main {
 
     //addItem: "food", "arroz", arroz.jpg, 300, 1.50
 
-    println("LEXER: " + POSLexer.apply(validCode).toString)
-    println("Compiler: " + POSCompiler.apply(validCode).toString)
+//    println("LEXER: " + POSLexer.apply(validCode).toString)
+//    println("Compiler: " + POSCompiler.apply(validCode).toString)
     //println(POSCompiler.apply(validCode).toString)
+
+    val parser = new LexThisParseThat
+
+    val result = parser.parseAll(parser.expr, "openMenu:\"MyMenu\"")
+
+    println(result.get)
   }
 }

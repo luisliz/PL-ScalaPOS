@@ -23,7 +23,7 @@ class ShopWindow(name: String) extends MainFrame{
   /** Constructor if no name is passed */
   def this() = this("SPCS")
 
-  //  private var itemList = List[Item]()
+//    private var itemList = List[Item]()
   // Just testing :)
   private var itemList = List(new Item("idk", "coca-cola", "coca-cola.jpg", 10, 0.99),
     new Item("idk", "arroz", "arroz.png", 54, 2.99),
@@ -81,6 +81,7 @@ class ShopWindow(name: String) extends MainFrame{
   /** Add an item to the window */
   def addItem(itemToAdd: Item): Unit = {
     itemList = itemList ::: List(itemToAdd)
+    mainPanel.repaint()
   }
 
   /** Remove an item from the window */
