@@ -245,7 +245,7 @@ object POSCompiler {
 object TestLexParser {
     def main(args: Array[String]): Unit = {
 
-        val fileName = "TestFile"
+        val fileName = "largeTest.txt"
         var fileContent = Source.fromFile(fileName).getLines.mkString;
 
         println(POSLexer.apply("createShop"))
