@@ -5,19 +5,17 @@ import shopgui.{Item, ShopWindow}
 import scala.io.Source
 
 object Main {
-	def main(args: Array[String]) {
-		//    val gui = new ShopWindow
-		//    gui.addItem(new Item("food", "arroz2", "arroz.jpg", 300, 1.50))
-		//    gui.visible = true
-		//    println("End of main function")
-		//
-		//    val validCode =
-		//      """
-		//      createShop: "My Shop";
-		//      receiptHeader: "Welcome to SHOP";
-		//      addItem: "food", "arroz", "arroz.jpg", 300, 1.50;
-		//      receiptFooter: "Thank you for shopping with us";
-		//      """.stripMargin.trim;
+  def main(args: Array[String]) {
+//    val gui = new ShopWindow
+//    gui.addItem(new Item("food", "arroz2", "arroz.jpg", 300, 1.50))
+//    gui.visible = true
+//    println("End of main function")
+//
+    val validCode =
+      """
+      createShop: "MyShop"
+      receiptHeader: "Welcome to SHOP"
+      """.stripMargin.trim;
 
 		/*
 
@@ -30,9 +28,6 @@ object Main {
 			deleteItem: "cocacola";
 			receiptFooter: "Thank you for shopping with us";*/
 
-
-		//addItem: "food", "arroz", arroz.jpg, 300, 1.50
-
 		//    println("LEXER: " + POSLexer.apply(validCode).toString)
 		//    println("Compiler: " + POSCompiler.apply(validCode).toString)
 		//println(POSCompiler.apply(validCode).toString)
@@ -43,6 +38,7 @@ object Main {
 		val stringInput =
 			"""
 			  |createShop: "Hey"
+|receiptFooter: "new header"
 			  |addItem: Lol, juan, pedro, junito, iwr
 			  |updateInventory: Lol, juan
 			  |addInventory: Lol, juan
@@ -61,7 +57,9 @@ object Main {
 		val parser = new LexThisParseThat
 
 		val result = parser.parseAll(parser.program, stringInput)
+    //val result = parser.parseAll(parser.expr, "createShop:\"MyMenu\"\nrenameShop:\"Lol\"")
+    //val result = parser.parseAll(parser.expr, validCode)
 
-		println(result.get)
+		//println(result.get)
 	}
 }
