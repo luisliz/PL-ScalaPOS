@@ -2,9 +2,8 @@ import scala.io.Source
 
 object Main {
     def main(args: Array[String]) {
-        //////?NEW STUFF HERE
-        //		val largeFile = Source.fromFile("files")
-        //		val shortFile = Source.fromFile("TestFile_2.txt")
+        val largeFile = Source.fromFile("largeFile.spos").mkString.stripMargin.trim
+        val shortFile = Source.fromFile("shortFile.spos").mkString.stripMargin.trim
         val stringInput =
         """
           |createShop: "MyShop"
@@ -25,12 +24,9 @@ object Main {
 		  |deleteFooter
         """.stripMargin.trim
 
-        val inputFile = stringInput //Decide file here
-        val inputSource = inputFile.mkString
-
         val parser = new LexThisParseThat
 
-        val result = parser.parseAll(parser.program, stringInput)
+        val result = parser.parseAll(parser.program, shortFile)
 
         println(result.get)
     }

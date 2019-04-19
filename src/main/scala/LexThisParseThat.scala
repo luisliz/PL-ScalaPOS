@@ -14,12 +14,14 @@ class LexThisParseThat extends RegexParsers {
 			content
 		}
 
+	val comment = """/*(.*?)*/""".r
+
 	var gui = new ShopWindow
 	gui.visible = false
 
 	def program: Parser[Any] = createShop ~ opt(rep(expr))
 
-	def expr: Parser[Any] = ShopExp | InvExp | ReceiptExp | AccExp
+	def expr: Parser[Any] = ShopExp | InvExp | ReceiptExp | AccExp | comment
 
 	def createShop: Parser[Any] = "createShop" ~ opt(":" ~ string) ^^ {
 		case a ~ None => {
