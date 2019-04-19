@@ -9,8 +9,9 @@ class LexThisParseThat extends RegexParsers {
   val comilla = "\"".r
 
   var gui = new ShopWindow
+  gui.visible = false
 
-  def expr: Parser[Any] =  createShop ~ opt(rep(expr)) | renameShop
+  def expr: Parser[Any] =  createShop ~ opt(rep(expr)) | addItem | receiptHeader | receiptFooter | deleteHeader | deleteFooter
 
   def createShop: Parser[Any] = "createShop" ~ opt(":" ~ comilla ~ string ~ comilla) ^^ {
 
@@ -25,9 +26,26 @@ class LexThisParseThat extends RegexParsers {
     }
   }
 
-  def renameShop: Parser[Any] = "renameShop:" ~ comilla ~ string ~ comilla ^^ {
-    case "renameShop:" ~ "\"" ~ b ~"\"" => {
-      gui.renameShop(b)
+//  def renameShop: Parser[Any] = "renameShop:" ~ comilla ~ string ~ comilla ^^ {
+//    case "renameShop:" ~ "\"" ~ b ~ "\"" => {
+//      gui.renameShop(b)
+//    }
+//  }
+
+  def addItem
+
+  def receiptHeader
+
+  def receiptFooter
+
+  def deleteHeader
+
+  def deleteFooter
+
+  def deleteItem: Parser[Any] = "deleteItem:" ~ comilla ~ string ~ comilla ^^ {
+    case "deleteItem:" ~ "\"" ~ b ~ "\"" => {
+      //ShopWindow functions need to be rewritten to accept the name of the item
+//      gui.removeItem(b)
     }
   }
 
