@@ -36,6 +36,7 @@ object Main {
 //    println("Compiler: " + POSCompiler.apply(validCode).toString)
     //println(POSCompiler.apply(validCode).toString)
 
+
     val parser = new LexThisParseThat
 
     val result = parser.parseAll(parser.expr, "openMenu:\"MyMenu\"")
