@@ -1,7 +1,3 @@
-import compiler.POSCompiler
-import lexer.POSLexer
-import shopgui.{Item, ShopWindow}
-
 import scala.io.Source
 
 object Main {
