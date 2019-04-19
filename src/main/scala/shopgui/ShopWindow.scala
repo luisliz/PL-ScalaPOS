@@ -4,8 +4,9 @@ import java.awt.MediaTracker
 
 import javax.swing.{Icon, ImageIcon}
 
-import scala.collection.mutable.Map
+import scala.collection.mutable.{ArrayBuffer, Map}
 import scala.swing._
+import scala.swing.event.SelectionChanged
 
 class ShopWindow(name: String) extends MainFrame{
 
@@ -18,10 +19,13 @@ class ShopWindow(name: String) extends MainFrame{
     * -[DONE]Pass info to the receipt
     * -[DONE]Label that says the amount there is of an item in the cart currently (thinking of making it a var in Item class)
     * -[DONE]add images for items and change on Item class (currently images are set as strings)
+    * -[DONE]Deal with add/remove user and displaying the current user properly
+    * -[DONE]Add current user label
+    * -Make receiptHeader and receiptFooter properly edit the header and footer (rn it simply deletes them)
     * */
 
   /** Constructor if no name is passed */
-  def this() = this("SPCS")
+  def this() = this("SPOS")
 
 //    private var itemList = List[Item]()
   // Just testing :)
@@ -32,6 +36,11 @@ class ShopWindow(name: String) extends MainFrame{
     new Item("idk", "doritos", "doritos.jpg", 102, 1.37),
     new Item("idk", "guitarra", "guitarra.png", 22, 100),
     new Item("idk", "avestruz", "avestruz.jpg", 1, 100000))
+
+  //list of users
+  //private var userList = new ArrayBuffer[String]()
+  private var userList = List[String]()
+  //private var userIndex = 0 //the idea is to change +1 this number whenever changeUser is called, and use this to access the respective user - this mechanism could be replaced with something like a dropdown menu
 
   private var transactionTotal: Double = 0
 
@@ -53,6 +62,8 @@ class ShopWindow(name: String) extends MainFrame{
   preferredSize = new Dimension(800, 500)
 
   private var totalLabel = new Label("Total: $" + transactionTotal)
+  private var currentUserLabel = new Label("Current User: ")
+  val cb = new ComboBox(userList)
 
   private val mainPanel = new BorderPanel {
     /** Left Panel - Product Display*/
@@ -61,6 +72,11 @@ class ShopWindow(name: String) extends MainFrame{
     /** Right Panel - Invoice Display*/
     var invoice = new BorderPanel {
       add(cartPanel, BorderPanel.Position.Center)
+
+      add(new FlowPanel {
+        contents += currentUserLabel
+        contents += cb
+      }, BorderPanel.Position.North)
 
       add(new FlowPanel {
         contents += totalLabel
@@ -97,6 +113,19 @@ class ShopWindow(name: String) extends MainFrame{
     receiptFooter = newFooter
   }
 
+  //method to add users
+  def addUserToList(newUser: String): Unit = {
+    //userList.append(newUser)
+    userList = userList ::: List[String](newUser)
+    cb.peer.setModel(ComboBox.newConstantModel(userList))
+  }
+
+  def removeUserFromList(userToRemove: String): Unit = {
+    userList = userList.filterNot( userRemove => userRemove == userToRemove)
+    cb.peer.setModel(ComboBox.newConstantModel(userList))
+  }
+
+
   /** Here you would pass the totals and the name of the items to pass to the receipt and then clear them for the next transaction */
   private def checkout(): Unit = {
     if(cart.size > 0)
@@ -110,7 +139,9 @@ class ShopWindow(name: String) extends MainFrame{
       items ++= k.name + " (quantity: " + v.toString + "   price: " + k.price.toString + ")\n"
     }
 
-    Dialog.showMessage(contents.head, receiptHeader + "\n\n\n" + items + "\n\n" + receiptFooter, title="Receipt")
+    var userToDisplay = cb.selection.item
+
+    Dialog.showMessage(contents.head, receiptHeader + "\n\n" + "Served by: " + userToDisplay + "\n\n" + "\n\n" + items + "\n\n" + receiptFooter, title="Receipt")
   }
 
   private def addToCart(item: Item, boxPanel: BoxPanel): Unit = {
