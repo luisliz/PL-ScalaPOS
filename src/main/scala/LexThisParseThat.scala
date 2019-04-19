@@ -9,9 +9,8 @@ class LexThisParseThat extends RegexParsers {
 
 	val digit = """[0-9_]+""".r
 
-	val string =
-		""""(.*?)"""".r ^^ { str =>
-			val content = str.substring(1, str.length - 1).toString
+	val string = """"(.*?)"""".r ^^ { str =>
+			val content = str.substring(1, str.length - 1)
 			content
 		}
 
@@ -115,75 +114,48 @@ class LexThisParseThat extends RegexParsers {
 	}
 
 	def ReceiptExp: Parser[Any] = {
-		def receiptHeader: Parser[Any] = "receiptHeader" ~ ":" ~ string ^^ {
-			case a => {
-				println("receiptHeader" + a)
-				//gui.changeReceiptHeader(str)
+		def receiptHeader: Parser[Any] = "receiptHeader:" ~ string ^^ {
+			case _ ~ str => {
+				gui.changeReceiptHeader(str)
 			}
 		}
-  def ReceiptExp: Parser[Any] = {
-    def receiptHeader: Parser[Any] = "receiptHeader:" ~ string ^^ {
-      case "receiptHeader:" ~ str  => {
-        gui.changeReceiptHeader(str)
-      }
-    }
 
 		def receiptFooter: Parser[Any] = "receiptFooter:" ~ string ^^ {
-			case a => {
-				println("receiptFooter" + a)
-				//gui.changeReceiptFooter(str)
+			case _ ~ str => {
+				gui.changeReceiptFooter(str)
 			}
 		}
-    def receiptFooter: Parser[Any] = "receiptFooter:" ~ comilla ~ string ~ comilla ^^ {
-      case "receiptFooter:" ~ _ ~ str ~ _ => {
-        gui.changeReceiptFooter(str)
-      }
-    }
 
 		def deleteHeader: Parser[Any] = "deleteHeader" ^^ {
 			case _ => {
 				println("deleteHeader")
-				//gui.changeReceiptHeader("")
+				gui.changeReceiptHeader("")
 			}
 		}
-    def deleteHeader: Parser[Any] = "receiptHeader" ^^ {
-      case a => {
-        gui.changeReceiptHeader("")
-      }
-    }
 
 		def deleteFooter: Parser[Any] = "deleteFooter" ^^ {
 			case _ => {
 				println("deleteFooter")
-				//gui.changeReceiptFooter("")
+				gui.changeReceiptFooter("")
 			}
 		}
-    def deleteFooter: Parser[Any] = "receiptFooter" ^^ {
-      case a => {
-        gui.changeReceiptFooter("")
-      }
-    }
 
 		receiptHeader | receiptFooter | deleteHeader | deleteFooter
 	}
-    receiptHeader | receiptFooter | deleteHeader | deleteFooter
-  }
 
 	def AccExp: Parser[Any] = {
 		def addUser: Parser[Any] = "addUser:" ~ string ^^ {
-			case str => {
+			case _ ~ str => {
 				gui.addUserToList(str) //falta hacer esta funcion en ShopWindow. se me ocurre hacer like a label somewhere que diga cual es el current user and maybe algo have like a button to change the current user (like literalmente who is using the gui) and also include the user info on the receipt (like fuiste atendido por tal user)
 			}
 		}
 
-		addUser
-	}
-    def removeUser: Parser[Any] = "removeUser:" ~ comilla ~ string ~ comilla ^^ {
-      case "removeUser:" ~ _ ~ str ~ _ => {
-        gui.removeUserFromList(str)
-      }
-    }
+		def removeUser: Parser[Any] = "removeUser:" ~ string ^^ {
+			case _ ~ str => {
+				gui.removeUserFromList(str)
+			}
+		}
 
-    addUser | removeUser
-  }
+		addUser | removeUser
+	}
 }
