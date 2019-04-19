@@ -38,7 +38,9 @@ object Main {
 		val stringInput =
 			"""
 			  |createShop: "Hey"
-|receiptFooter: "new header"
+				|addUser: "Jorge"
+				|addUser: "Gabriel"
+				|receiptFooter: "new header"
 			  |addItem: Lol, juan, pedro, junito, iwr
 			  |updateInventory: Lol, juan
 			  |addInventory: Lol, juan

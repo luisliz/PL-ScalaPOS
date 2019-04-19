@@ -148,10 +148,16 @@ class LexThisParseThat extends RegexParsers {
   def AccExp: Parser[Any] = {
     def addUser: Parser[Any] = "addUser:" ~ comilla ~ string ~ comilla ^^ {
       case "addUser:" ~ _ ~ str ~ _ => {
-        //gui.addUser(str) falta hacer esta funcion en ShopWindow. se me ocurre hacer like a label somewhere que diga cual es el current user and maybe algo have like a button to change the current user (like literalmente who is using the gui) and also include the user info on the receipt (like fuiste atendido por tal user)
+        gui.addUserToList(str) //falta hacer esta funcion en ShopWindow. se me ocurre hacer like a label somewhere que diga cual es el current user and maybe algo have like a button to change the current user (like literalmente who is using the gui) and also include the user info on the receipt (like fuiste atendido por tal user)
       }
     }
 
-    addUser
+    def removeUser: Parser[Any] = "removeUser:" ~ comilla ~ string ~ comilla ^^ {
+      case "removeUser:" ~ _ ~ str ~ _ => {
+        gui.removeUserFromList(str)
+      }
+    }
+
+    addUser | removeUser
   }
 }
