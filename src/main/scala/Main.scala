@@ -5,63 +5,40 @@ import shopgui.{Item, ShopWindow}
 import scala.io.Source
 
 object Main {
-	def main(args: Array[String]) {
-		//    val gui = new ShopWindow
-		//    gui.addItem(new Item("food", "arroz2", "arroz.jpg", 300, 1.50))
-		//    gui.visible = true
-		//    println("End of main function")
-		//
-		//    val validCode =
-		//      """
-		//      createShop: "My Shop";
-		//      receiptHeader: "Welcome to SHOP";
-		//      addItem: "food", "arroz", "arroz.jpg", 300, 1.50;
-		//      receiptFooter: "Thank you for shopping with us";
-		//      """.stripMargin.trim;
+    def main(args: Array[String]) {
+        //////?NEW STUFF HERE
+        //		val largeFile = Source.fromFile("files")
+        //		val shortFile = Source.fromFile("TestFile_2.txt")
+        val stringInput =
+        """
+          |createShop: "MyShop"
+          |renameShop: "hey"
+          |addItem: "Lol", "juan", "pedro", "junito", "iwr"
+          |deleteItem: "eyy"
+          |updateInventory: "oh", "yeah"
+          |removeInventory: "oh", "no"
+		  |updatePrice: "option11", "option"
+		  |updateCategory: "option1", "option2"
+          |updatePhoto: "option 1", "option2"
+          |settlementGridDimensions: "option 1", "option2"
+          |addToCart: "option 1", "option2"
+          |removeToCart: "option 1", "option2"
+		  |receiptHeader: "word"
+          |receiptFooter: "stuff"
+          |deleteHeader
+          |deleteFooter
+        """.stripMargin.trim
 
-		/*
+        /*
+        */
 
-			addItem: "drink, "cocacola", null, 500, 1;
-			addItem: "food", "arroz", "arroz.jpg", 300, 1.50;
-			addInventory: "arroz", 3;
-			removeInventory: "cocacola", 20;
-			updateInventory: "arroz", 200;
-			updatePrice: "arroz", 1.60;
-			deleteItem: "cocacola";
-			receiptFooter: "Thank you for shopping with us";*/
+        val inputFile = stringInput //Decide file here
+        val inputSource = inputFile.mkString
 
+        val parser = new LexThisParseThat
 
-		//addItem: "food", "arroz", arroz.jpg, 300, 1.50
+        val result = parser.parseAll(parser.program, stringInput)
 
-		//    println("LEXER: " + POSLexer.apply(validCode).toString)
-		//    println("Compiler: " + POSCompiler.apply(validCode).toString)
-		//println(POSCompiler.apply(validCode).toString)
-
-		//////?NEW STUFF HERE
-//		val largeFile = Source.fromFile("files")
-//		val shortFile = Source.fromFile("TestFile_2.txt")
-		val stringInput =
-			"""
-			  |createShop: "Hey"
-			  |addItem: Lol, juan, pedro, junito, iwr
-			  |updateInventory: Lol, juan
-			  |addInventory: Lol, juan
-			  |removeInventory: Lol, juan
-			  |updatePrice: Lol, juan
-			  |updateCategory: Lol, juan
-			  |updatePhoto: Lol, juan
-			  |settlementGridDimensions: Lol, juan
-			  |addToCart: Lol, juan
-			  |removeToCart: Lol, juan
-			""".stripMargin
-
-		val inputFile = stringInput //Decide file here
-		val inputSource = inputFile.mkString
-
-		val parser = new LexThisParseThat
-
-		val result = parser.parseAll(parser.program, stringInput)
-
-		println(result.get)
-	}
+        println(result.get)
+    }
 }
