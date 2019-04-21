@@ -131,6 +131,8 @@ class ShopWindow(name: String) extends MainFrame{
     if(cart.size > 0)
       displayReceipt()
       transactionTotal = 0
+      cart.clear()
+      updateCart()
   }
 
   private def displayReceipt(): Unit = {
