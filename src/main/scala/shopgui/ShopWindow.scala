@@ -96,8 +96,9 @@ class ShopWindow(name: String) extends MainFrame{
 
   /** Add an item to the window */
   def addItem(itemToAdd: Item): Unit = {
-    itemList = itemList ::: List(itemToAdd)
-    mainPanel.repaint()
+    itemList = itemToAdd :: itemList
+    mainPanel.layout.update(getItemsPanel(), BorderPanel.Position.Center)
+//    mainPanel.repaint()
   }
 
   /** Remove an item from the window */
@@ -130,9 +131,9 @@ class ShopWindow(name: String) extends MainFrame{
   private def checkout(): Unit = {
     if(cart.size > 0)
       displayReceipt()
-      transactionTotal = 0
-      cart.clear()
-      updateCart()
+    transactionTotal = 0
+    cart.clear()
+    updateCart()
   }
 
   private def displayReceipt(): Unit = {
