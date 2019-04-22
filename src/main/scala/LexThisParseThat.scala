@@ -1,4 +1,5 @@
 import shopgui.{Item, ShopWindow}
+import tools.tools
 
 import scala.util.parsing.combinator.RegexParsers
 
@@ -17,6 +18,7 @@ class LexThisParseThat extends RegexParsers {
 	val comment = """/*(.*?)*/""".r
 
 	var gui = new ShopWindow
+	var tools = new tools
 	gui.visible = false
 
 	def program: Parser[Any] = createShop ~ opt(rep(expr))
@@ -112,7 +114,13 @@ class LexThisParseThat extends RegexParsers {
 			}
 		}
 
-		addItem | deleteItem | updateInventory | addInventory | removeInventory | updatePrice | updateCategory | updatePhoto | settlementGridDimensions | addToCart | removeToCart
+		def listen: Parser[Any] = "listen" ^^ {
+			case _ => {
+				tools.listen()
+			}
+		}
+
+		addItem | deleteItem | updateInventory | addInventory | removeInventory | updatePrice | updateCategory | updatePhoto | settlementGridDimensions | addToCart | removeToCart | listen
 	}
 
 	def ReceiptExp: Parser[Any] = {
