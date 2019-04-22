@@ -5,6 +5,7 @@ import java.awt.MediaTracker
 import javax.swing.{Icon, ImageIcon}
 
 import scala.collection.mutable.{ArrayBuffer, Map}
+import scala.collection.mutable.Set
 import scala.swing._
 import scala.swing.event.SelectionChanged
 
@@ -29,7 +30,7 @@ class ShopWindow(name: String) extends MainFrame{
 
 //    private var itemList = List[Item]()
   // Just testing :)
-  private var itemList = List(new Item("idk", "coca-cola", "coca-cola.jpg", 10, 0.99),
+  private var itemList = Set(new Item("idk", "coca-cola", "coca-cola.jpg", 10, 0.99),
     new Item("idk", "arroz", "arroz.png", 54, 2.99),
     new Item("idk", "pizza", "pizza.png", 49, 14.99),
     new Item("idk", "coco", "coco.jpg", 11, 2.99),
@@ -96,14 +97,25 @@ class ShopWindow(name: String) extends MainFrame{
 
   /** Add an item to the window */
   def addItem(itemToAdd: Item): Unit = {
-    itemList = itemToAdd :: itemList
+    itemList = itemList + itemToAdd
     mainPanel.layout.update(getItemsPanel(), BorderPanel.Position.Center)
+
 //    mainPanel.repaint()
+    mainPanel.revalidate()
   }
 
-  /** Remove an item from the window */
-  def removeItem(itemToRemove: Item): Unit = {
-    itemList = itemList.filter(_ == itemToRemove)
+  /** Remove an item from the window (0->not found, 1->removed) */
+  def removeItem(itemName: String): Int = {
+    var success = 0
+    for(i <- itemList)
+      if(i.name == itemName)
+        itemList.remove(i)
+        success = 1
+
+    mainPanel.layout.update(getItemsPanel(), BorderPanel.Position.Center)
+    mainPanel.revalidate()
+    success
+//    itemList = itemList.filter(_ == itemToRemove)
   }
 
   def changeReceiptHeader(newHeader: String): Unit = {

@@ -50,13 +50,17 @@ class LexThisParseThat extends RegexParsers {
 	def InvExp: Parser[Any] = {
 		def addItem: Parser[Any] = "addItem" ~ ":" ~ string ~ "," ~ string ~ "," ~ string ~ "," ~ digit ~ "," ~ double ^^ {
 			case _ ~ category ~ _ ~ itemName ~ _ ~ imageName ~ _ ~ units ~ _ ~ price => {
-				println("addItem: " + category + " " + itemName + " " + imageName + " " + units + " " + price)
+				gui.addItem(new Item(category, itemName, imageName, units.toInt, price.toDouble))
+//				println("addItem: " + category + " " + itemName + " " + imageName + " " + units + " " + price)
+				println("Item Added: " + itemName)
 			}
 		}
 
 		def deleteItem: Parser[Any] = "deleteItem" ~ ":" ~ string ^^ {
 			case _ ~ a => {
-				println("deleteItem: " + a)
+				val data = gui.removeItem(a)
+				println(if(data==1) "Item deleted successfully" else "Item not found")
+//				println("deleteItem: " + a)
 			}
 		}
 
