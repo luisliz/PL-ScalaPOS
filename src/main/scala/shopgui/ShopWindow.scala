@@ -105,15 +105,15 @@ class ShopWindow(name: String) extends MainFrame{
   }
 
   /** Remove an item from the window (0->not found, 1->removed) */
-  def removeItem(itemName: String): Int = {
-    var success = 0
-    for(i <- itemList)
-      if(i.name == itemName)
-        itemList.remove(i)
-        success = 1
-
-    mainPanel.layout.update(getItemsPanel(), BorderPanel.Position.Center)
-    mainPanel.revalidate()
+  def removeItem(itemName: String): Boolean = {
+    var success = false
+    val item = getItemFromList(itemName)
+    if(item != null){
+      itemList.remove(item)
+      success = true
+      mainPanel.layout.update(getItemsPanel(), BorderPanel.Position.Center)
+      mainPanel.revalidate()
+    }
     success
 //    itemList = itemList.filter(_ == itemToRemove)
   }
@@ -138,6 +138,82 @@ class ShopWindow(name: String) extends MainFrame{
     cb.peer.setModel(ComboBox.newConstantModel(userList))
   }
 
+  def updateInventory(itemName: String, quantity: Int): Boolean ={
+    val item = getItemFromList(itemName)
+    if(item != null){
+      manageInventory(item, quantity)
+      true
+    } else false
+  }
+
+  def addInventory(itemName: String, quantity: Int): Boolean ={
+    val item = getItemFromList(itemName)
+    if(item != null){
+      manageInventory(item, item.inventory + quantity)
+      true
+    } else false
+  }
+
+  private def manageInventory(item: Item, quantity: Int): Unit ={
+    item.inventory = quantity
+    revalidateItemsPanel()
+  }
+
+  def updatePrice(itemName: String, price: Double): Boolean ={
+    val item = getItemFromList(itemName)
+    if(item != null){
+      item.price = price
+      revalidateItemsPanel()
+      true
+    } else false
+  }
+
+  def updateCategory(itemName: String, category: String): Boolean ={
+    val item = getItemFromList(itemName)
+    if(item != null){
+      item.category = category
+      revalidateItemsPanel()
+      true
+    } else false
+  }
+
+  def updatePhoto(itemName: String, imgName: String): Boolean ={
+    val item = getItemFromList(itemName)
+    if(item != null){
+      item.photo = imgName
+      revalidateItemsPanel()
+      true
+    } else false
+  }
+
+  def addToCartLex(itemName: String, quantity: Int): Boolean ={
+    val item = getItemFromList(itemName)
+    if(item != null && item.inventory >= quantity){
+      addToCart(item, quantity)
+      true
+    } else false
+  }
+
+  def removeFromCartLex(itemName: String, quantity: Int): Boolean ={
+    val item = getItemFromList(itemName)
+    if(item != null && cart.contains(item) && cart(item) >= quantity){
+      removeFromCart(item, quantity)
+      true
+    } else false
+  }
+
+  private def revalidateItemsPanel(): Unit ={
+    mainPanel.layout.update(getItemsPanel(), BorderPanel.Position.Center)
+    mainPanel.revalidate()
+  }
+
+  private def getItemFromList(itemName: String): Item ={
+    for(i <- itemList)
+      if(i.name == itemName) {
+        return i
+      }
+    null
+  }
 
   /** Here you would pass the totals and the name of the items to pass to the receipt and then clear them for the next transaction */
   private def checkout(): Unit = {
@@ -159,28 +235,19 @@ class ShopWindow(name: String) extends MainFrame{
     Dialog.showMessage(contents.head, receiptHeader + "\n\n" + "Served by: " + userToDisplay + "\n\n" + "\n\n" + items + "\n\n" + receiptFooter, title="Receipt")
   }
 
-  private def addToCart(item: Item, boxPanel: BoxPanel): Unit = {
+  private def addToCart(item: Item, quantity: Integer = 1): Unit = {
     // update item inventory
-    addToTotal(item.price)
-    item.removeInventory(1)
-    println("inventory: " + item.inventory)
-
-    // disable add button if necessary
-    if (item.inventory <= 0) {
-      val newButton = boxPanel.contents.head
-      newButton.enabled_=(false)
-      boxPanel.contents.update(0, newButton)
-    }
+    addToTotal(item.price * quantity)
+    item.removeInventory(quantity)
 
     //add item to cart collection (includes quantity as map value)
-    if(cart.contains(item)) cart += (item -> (cart(item)+1)) else (cart += (item -> 1))
+    if(cart.contains(item)) cart += (item -> (cart(item)+quantity)) else (cart += (item -> quantity))
 
     //update displayed cart
     updateCart()
 
-    // update amount left label
-    updateAmountLabel(item, boxPanel)
-    //    println(item.inventory)
+    // update item data, including quantity
+    revalidateItemsPanel()
   }
 
   private def updateCart(): Unit ={
@@ -207,24 +274,24 @@ class ShopWindow(name: String) extends MainFrame{
     println("transactionTotal: " + transactionTotal)
   }
 
-  private def removeFromCart(item: Item): Unit = {
+  private def removeFromCart(item: Item, quantity: Integer = 1): Unit = {
     // update item inventory
-    removeFromTotal(item.price)
-    item.addInventory(1)
-    println("inventory: " + item.inventory)
+    removeFromTotal(item.price * quantity)
+    item.addInventory(quantity)
 
     //remove item to cart collection (includes quantity as map value)
     if(cart.contains(item)) {
-      if (cart(item) == 1)
+      if (cart(item) == quantity)
         cart -= (item)
       else
-        cart += (item -> (cart(item) - 1))
+        cart += (item -> (cart(item) - quantity))
     }
 
     //update displayed cart
     updateCart()
 
-    mainPanel.layout.update(getItemsPanel(), BorderPanel.Position.Center)
+    //update the items panel
+    revalidateItemsPanel()
   }
 
   /* This doesn't have a condition for if the total gets to be less than 0 because the button should only be clickable with items that
@@ -248,7 +315,7 @@ class ShopWindow(name: String) extends MainFrame{
         contents += new BoxPanel(Orientation.Vertical) {
           var icon = new ImageIcon("src/media/products/" + i.photo)
           if(icon.getImageLoadStatus != MediaTracker.COMPLETE) icon = new ImageIcon("src/media/products/no-image.png")
-          var addToCartButton = Button("") { addToCart(i, this) }
+          var addToCartButton = Button("") { addToCart(i) }
           addToCartButton.enabled_=(i.inventory > 0)
           addToCartButton.icon_=(icon)
           //          addToCartButton.maximumSize_=(new Dimension(100, 100))

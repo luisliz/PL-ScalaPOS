@@ -58,45 +58,50 @@ class LexThisParseThat extends RegexParsers {
 
 		def deleteItem: Parser[Any] = "deleteItem" ~ ":" ~ string ^^ {
 			case _ ~ a => {
-				val data = gui.removeItem(a)
-				println(if(data==1) "Item deleted successfully" else "Item not found")
+				println(if(gui.removeItem(a)) "Item deleted successfully" else "Item not found")
 //				println("deleteItem: " + a)
 			}
 		}
 
 		def updateInventory: Parser[Any] = "updateInventory" ~ ":" ~ string ~ "," ~ digit ^^ {
 			case _ ~ itemName ~ _ ~ amount => {
-				println("updateInventory:" + itemName + " " + amount)
+				println(if(gui.updateInventory(itemName, amount.toInt)) "Item inventory updated" else "Item not found")
+//				println("updateInventory:" + itemName + " " + amount)
 			}
 		}
 
 		def addInventory: Parser[Any] = "addInventory" ~ ":" ~ string ~ "," ~ digit ^^ {
 			case _ ~ itemName ~ _ ~ amount => {
-				println("addinventory: " + itemName + " " + amount)
+				println(if(gui.updateInventory(itemName, amount.toInt)) "Added inventory to item" else "Item not found")
+//				println("addinventory: " + itemName + " " + amount)
 			}
 		}
 
 		def removeInventory: Parser[Any] = "removeInventory" ~ ":" ~ string ~ "," ~ digit ^^ {
 			case _ ~ itemName ~ _ ~ amount => {
-				println("removeInventory: " + itemName + " " + amount)
+				println(if(gui.updateInventory(itemName, -amount.toInt)) "Removed inventory from item" else "Item not found")
+//				println("removeInventory: " + itemName + " " + amount)
 			}
 		}
 
 		def updatePrice: Parser[Any] = "updatePrice" ~ ":" ~ string ~ "," ~ double ^^ {
 			case _ ~ itemName ~ _ ~ newPrice => {
-				println("updatePrice: " + itemName + " " + newPrice)
+				println(if(gui.updatePrice(itemName, newPrice.toDouble)) "Item price changed" else "Item not found")
+				//				println("updatePrice: " + itemName + " " + newPrice)
 			}
 		}
 
 		def updateCategory: Parser[Any] = "updateCategory" ~ ":" ~ string ~ "," ~ string ^^ {
-			case _ ~ a ~ _ ~ b => {
-				println("updateCategory" + a + " " + b)
+			case _ ~ itemName ~ _ ~ category => {
+				println(if(gui.updateCategory(itemName, category)) "Item category changed" else "Item not found")
+				//				println("updateCategory" + a + " " + b)
 			}
 		}
 
 		def updatePhoto: Parser[Any] = "updatePhoto" ~ ":" ~ string ~ "," ~ string ^^ {
-			case _ ~ a ~ _ ~ b => {
-				println("updatePhoto" + a + " " + b)
+			case _ ~ itemName ~ _ ~ photo => {
+				println(if(gui.updatePhoto(itemName, photo)) "Item photo changed" else "Item not found")
+//				println("updatePhoto" + a + " " + b)
 			}
 		}
 
@@ -106,15 +111,17 @@ class LexThisParseThat extends RegexParsers {
 			}
 		}
 
-		def addToCart: Parser[Any] = "addToCart" ~ ":" ~ string ~ "," ~ string ^^ {
-			case _ ~ a ~ _ ~ b => {
-				println("addToCart" + a + " " + b)
+		def addToCart: Parser[Any] = "addToCart" ~ ":" ~ string ~ "," ~ digit ^^ {
+			case _ ~ itemName ~ _ ~ quantity => {
+				println(if(gui.addToCartLex(itemName, quantity.toInt)) "Item(s) added to cart" else "Unable to add item(s) to cart")
+//				println("addToCart" + itemName + " " + quantity)
 			}
 		}
 
-		def removeToCart: Parser[Any] = "removeToCart" ~ ":" ~ string ~ "," ~ string ^^ {
-			case _ ~ a ~ _ ~ b => {
-				println("removeToCart" + a + " " + b)
+		def removeToCart: Parser[Any] = "removeToCart" ~ ":" ~ string ~ "," ~ digit ^^ {
+			case _ ~ itemName ~ _ ~ quantity => {
+				println(if(gui.removeFromCartLex(itemName, quantity.toInt)) "Item(s) removed from cart" else "Unable to remove item(s) from cart")
+//				println("removeToCart" + a + " " + b)
 			}
 		}
 
