@@ -11,32 +11,18 @@ import scala.swing.event.SelectionChanged
 
 class ShopWindow(name: String) extends MainFrame{
 
-  /** To Do:
-    * -GridBag Panel can be used to divide into cart and items sections http://otfried.org/scala/index_42.html
-    * -Section with all items on cart and their amount and total
-    * -Only can hit remove from cart button if its on cart (this button could also be next to the item on the cart section)
-    * -[DONE] Lower inventory with every click and restore it if item removed from cart
-    * -[DONE] Only can add to cart if enough inventory
-    * -[DONE]Pass info to the receipt
-    * -[DONE]Label that says the amount there is of an item in the cart currently (thinking of making it a var in Item class)
-    * -[DONE]add images for items and change on Item class (currently images are set as strings)
-    * -[DONE]Deal with add/remove user and displaying the current user properly
-    * -[DONE]Add current user label
-    * -Make receiptHeader and receiptFooter properly edit the header and footer (rn it simply deletes them)
-    * */
-
   /** Constructor if no name is passed */
   def this() = this("SPOS")
 
-//    private var itemList = List[Item]()
+    private var itemList = Set[Item]()
   // Just testing :)
-  private var itemList = Set(new Item("idk", "coca-cola", "coca-cola.jpg", 10, 0.99),
-    new Item("idk", "arroz", "arroz.png", 54, 2.99),
-    new Item("idk", "pizza", "pizza.png", 49, 14.99),
-    new Item("idk", "coco", "coco.jpg", 11, 2.99),
-    new Item("idk", "doritos", "doritos.jpg", 102, 1.37),
-    new Item("idk", "guitarra", "guitarra.png", 22, 100),
-    new Item("idk", "avestruz", "avestruz.jpg", 1, 100000))
+//  private var itemList = Set(new Item("idk", "coca-cola", "coca-cola.jpg", 10, 0.99),
+//    new Item("idk", "arroz", "arroz.png", 54, 2.99),
+//    new Item("idk", "pizza", "pizza.png", 49, 14.99),
+//    new Item("idk", "coco", "coco.jpg", 11, 2.99),
+//    new Item("idk", "doritos", "doritos.jpg", 102, 1.37),
+//    new Item("idk", "guitarra", "guitarra.png", 22, 100),
+//    new Item("idk", "avestruz", "avestruz.jpg", 1, 100000))
 
   //list of users
   //private var userList = new ArrayBuffer[String]()
@@ -60,7 +46,14 @@ class ShopWindow(name: String) extends MainFrame{
 
   /* MainFrame class actions */
   title = name
-  preferredSize = new Dimension(800, 500)
+
+  import java.awt.Dimension
+  import java.awt.Toolkit
+
+  val screenSize: Dimension = Toolkit.getDefaultToolkit.getScreenSize
+  val defaultWidth: Double = screenSize.getWidth / 2
+  val defaultHeight: Double = screenSize.getHeight / 2
+  preferredSize = new Dimension(defaultWidth.toInt, defaultHeight.toInt)
 
   private var totalLabel = new Label("Total: $" + transactionTotal)
   private var currentUserLabel = new Label("Current User: ")
@@ -93,6 +86,12 @@ class ShopWindow(name: String) extends MainFrame{
   /** Change main screen name */
   def renameShop(newName: String): Unit = {
     title = newName
+  }
+
+  /** Change size of window */
+  def resizeWindow(width: Int, height: Int): Unit = {
+   // preferredSize = new Dimension(width, height)
+    this.size_=(new Dimension(width, height))
   }
 
   /** Add an item to the window */
@@ -219,7 +218,7 @@ class ShopWindow(name: String) extends MainFrame{
   private def checkout(): Unit = {
     if(cart.size > 0)
       displayReceipt()
-    transactionTotal = 0
+    removeFromTotal(transactionTotal)
     cart.clear()
     updateCart()
   }
@@ -232,7 +231,7 @@ class ShopWindow(name: String) extends MainFrame{
 
     var userToDisplay = cb.selection.item
 
-    Dialog.showMessage(contents.head, receiptHeader + "\n\n" + "Served by: " + userToDisplay + "\n\n" + "\n\n" + items + "\n\n" + receiptFooter, title="Receipt")
+    Dialog.showMessage(contents.head, receiptHeader + "\n\n" + "Served by: " + userToDisplay + "\n\n" + "\n\n" + items + "\n\n" + "Total: " + transactionTotal + "\n\n" + receiptFooter, title="Receipt")
   }
 
   private def addToCart(item: Item, quantity: Integer = 1): Unit = {

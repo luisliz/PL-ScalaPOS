@@ -1,9 +1,9 @@
 
 createShop: "My Shop"
 
-addItem: "food", "arroz", "arroz.jpg", 300, 1.50
+addItem: "food", "arroz", "arroz.png", 300, 1.50
 
-addItem: "drink", "cocacola", "null", 500, 1
+addItem: "drink", "cocacola", "coca-cola.jpg", 500, 1
 
 addInventory: "arroz", 3
 
@@ -16,3 +16,7 @@ updatePrice: "arroz", 1.60
 deleteItem: "cocacola"
 
 receiptFooter: "Thank you for shopping with us"
+
+addUser: "Bienve"
+
+/* windowSize: 1000, 800 */

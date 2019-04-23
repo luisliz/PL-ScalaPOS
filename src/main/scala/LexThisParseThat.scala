@@ -44,7 +44,14 @@ class LexThisParseThat extends RegexParsers {
 			}
 		}
 
-		renameShop
+		def windowSize: Parser[Any] = "windowSize" ~ ":" ~ digit ~ "," ~ digit ^^ {
+			case _ ~ a ~ "," ~ b => {
+				gui.resizeWindow(a.toInt, b.toInt)
+				println("Changed Size")
+			}
+		}
+
+		renameShop | windowSize
 	}
 
 	def InvExp: Parser[Any] = {
