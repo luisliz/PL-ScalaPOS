@@ -21,7 +21,6 @@ class Item(itemCategory: String, itemName: String, itemPhoto: String, itemInvent
     _category = newValue
   }
 
-  /** idk what to use for photos so im putting them as strings for now */
   def photo: String = _photo
 
   def photo_=(newValue: String): Unit = {

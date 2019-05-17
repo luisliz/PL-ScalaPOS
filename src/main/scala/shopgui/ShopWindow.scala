@@ -14,20 +14,9 @@ class ShopWindow(name: String) extends MainFrame{
   /** Constructor if no name is passed */
   def this() = this("SPOS")
 
-    private var itemList = Set[Item]()
-  // Just testing :)
-//  private var itemList = Set(new Item("idk", "coca-cola", "coca-cola.jpg", 10, 0.99),
-//    new Item("idk", "arroz", "arroz.png", 54, 2.99),
-//    new Item("idk", "pizza", "pizza.png", 49, 14.99),
-//    new Item("idk", "coco", "coco.jpg", 11, 2.99),
-//    new Item("idk", "doritos", "doritos.jpg", 102, 1.37),
-//    new Item("idk", "guitarra", "guitarra.png", 22, 100),
-//    new Item("idk", "avestruz", "avestruz.jpg", 1, 100000))
+  private var itemList = Set[Item]()
 
-  //list of users
-  //private var userList = new ArrayBuffer[String]()
   private var userList = List[String]()
-  //private var userIndex = 0 //the idea is to change +1 this number whenever changeUser is called, and use this to access the respective user - this mechanism could be replaced with something like a dropdown menu
 
   private var transactionTotal: Double = 0
 
@@ -90,7 +79,6 @@ class ShopWindow(name: String) extends MainFrame{
 
   /** Change size of window */
   def resizeWindow(width: Int, height: Int): Unit = {
-   // preferredSize = new Dimension(width, height)
     this.size_=(new Dimension(width, height))
   }
 
@@ -99,7 +87,6 @@ class ShopWindow(name: String) extends MainFrame{
     itemList = itemList + itemToAdd
     mainPanel.layout.update(getItemsPanel(), BorderPanel.Position.Center)
 
-//    mainPanel.repaint()
     mainPanel.revalidate()
   }
 
@@ -114,7 +101,6 @@ class ShopWindow(name: String) extends MainFrame{
       mainPanel.revalidate()
     }
     success
-//    itemList = itemList.filter(_ == itemToRemove)
   }
 
   def changeReceiptHeader(newHeader: String): Unit = {
@@ -125,9 +111,7 @@ class ShopWindow(name: String) extends MainFrame{
     receiptFooter = newFooter
   }
 
-  //method to add users
   def addUserToList(newUser: String): Unit = {
-    //userList.append(newUser)
     userList = userList ::: List[String](newUser)
     cb.peer.setModel(ComboBox.newConstantModel(userList))
   }
@@ -251,7 +235,6 @@ class ShopWindow(name: String) extends MainFrame{
 
   private def updateCart(): Unit ={
     val p = new ScrollPane(new BoxPanel(Orientation.Vertical) {
-//      println(cart)
       for ((k,v) <- cart) {
         println(s"key: $k, value: $v")
         contents += new BoxPanel(Orientation.Horizontal) {
@@ -304,7 +287,6 @@ class ShopWindow(name: String) extends MainFrame{
   private def updateAmountLabel(item: Item, boxPanel: BoxPanel): Unit = {
     val newAmountLeft = new Label("Amount left: " + item.inventory)
     boxPanel.contents.update(6, newAmountLeft)
-//    println(boxPanel.contents)
     boxPanel.repaint()
   }
 
@@ -317,7 +299,6 @@ class ShopWindow(name: String) extends MainFrame{
           var addToCartButton = Button("") { addToCart(i) }
           addToCartButton.enabled_=(i.inventory > 0)
           addToCartButton.icon_=(icon)
-          //          addToCartButton.maximumSize_=(new Dimension(100, 100))
           contents += addToCartButton
           contents += Swing.VStrut(5)
           contents += new Label(i.name)

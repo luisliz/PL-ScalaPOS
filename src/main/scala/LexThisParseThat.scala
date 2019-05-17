@@ -32,7 +32,6 @@ class LexThisParseThat extends RegexParsers {
 
 		case a ~ Some(":" ~ b) => {
 			gui = new ShopWindow(b)
-			//      gui.addItem(new Item("food", "food", "coco.jpg", 10, 20))
 			gui.visible = true
 		}
 	}
