@@ -68,7 +68,7 @@
         <div class="card h-100">
           <h4 class="card-header">Motivation</h4>
           <div class="card-body">
-            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sapiente esse necessitatibus neque.</p>
+            <p class="card-text">One of the potential project ideas that were presented by Prof. Wilson Rivera for this course was to implement a previous project from the Fall 2018 course using Racket or Scala. Since most of these past projects use Python, we decided to try out Scala. We all agree that this was a good choice since one of our main goals while doing this was to expand our knowledge of new programming languages, and a good way of doing so was to explore the capabilities of the Scala language, while at the same time providing ourselves with a little challenge.</p>
           </div>
         </div>
       </div>
@@ -76,7 +76,16 @@
         <div class="card h-100">
           <h4 class="card-header">Features</h4>
           <div class="card-body">
-            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sapiente esse necessitatibus neque.</p>
+            <p class="card-text">
+              <ul>
+                <li>Add items to the shop window</li>
+                <li>Keep track of inventory</li>
+                <li>Customize receipt</li>
+                <li>Add users(cashiers)</li>
+                <li>Modify your shop in real time</li>
+                <li>And more!</li>
+              </ul>
+            </p>
           </div>
         </div>
       </div>
@@ -87,7 +96,29 @@
         <div class="card h-100">
           <h4 class="card-header">Sample Code</h4>
           <div class="card-body">
-            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sapiente esse necessitatibus neque.</p>
+            <p class="card-text">
+              /* Creates empty shop GUI with the given title */
+              createShop: “My Shop”
+
+              /* Adds specified item to the shop GUI */
+              addItem: “food”, “arroz”, “arroz.jpg”, 300, 1.50
+              addItem: “drink”, “cocacola”, “cocacola.jpg”, 500, 1
+
+              /* Adds or subtracts inventory to item */
+              addInventory: “arroz”, 3
+              removeInventory: “cocacola”, 20
+
+              /* Overrides inventory with new parameters */
+              updateInventory: “arroz”, 200
+
+              /* Overrides price */
+              updatePrice: “arroz”, 1.60
+
+              /* Remove an item from the shop GUI */
+              deleteItem: “cocacola”
+
+              /* Set the string passed as an input as the receipt footer */
+              recepitFooter: “Thank you for shopping with us”</p>
           </div>
         </div>
       </div>
